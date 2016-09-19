@@ -1,36 +1,32 @@
 package com.syntones.response;
 
 import com.syntones.model.Message;
-import com.syntones.model.Song;
+import com.syntones.model.Playlist;
 
 import java.util.List;
 
 
 public class PlaylistSongsResponse {
-    private List<Song> songsOnPlaylist;
-    private Message message;
+	private Playlist playlist;
+	private Message message;
 
-    public PlaylistSongsResponse() {
-    }
+	public PlaylistSongsResponse() {
+	}
 
+	public Playlist getPlaylist() {
+		return playlist;
+	}
 
-    public List<Song> getSongsOnPlaylist() {
-        return songsOnPlaylist;
-    }
+	public void setPlaylist(Playlist playlist) {
+		this.playlist = playlist;
+	}
 
+	public Message getMessage() {
+		return message;
+	}
 
-    public void setSongsOnPlaylist(List<Song> songsOnPlaylist) {
-        this.songsOnPlaylist = songsOnPlaylist;
-    }
-
-
-    public Message getMessage() {
-        return message;
-    }
-
-    public void setMessage(Message message) {
-        this.message = message;
-    }
-
-
+	public void setMessage(Message message) {
+		this.message = message;
+	}
+	
 }

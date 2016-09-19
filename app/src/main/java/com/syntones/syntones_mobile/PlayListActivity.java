@@ -20,6 +20,8 @@ import com.syntones.model.Playlist;
 import com.syntones.model.User;
 import com.syntones.remote.SyntonesWebAPI;
 import com.syntones.response.PlaylistResponse;
+import com.syntones.response.RemovePlaylistResponse;
+import com.syntones.response.RemoveToPlaylistResponse;
 
 import org.w3c.dom.Text;
 
@@ -48,6 +50,7 @@ public class PlayListActivity extends AppCompatActivity {
         PlaylistsLv.setAdapter(arrayAdapater);
         RemoveBtn = (Button) findViewById(R.id.btnRemove);
 
+        this.displayPlaylist();
         PlaylistsLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
@@ -55,10 +58,44 @@ public class PlayListActivity extends AppCompatActivity {
             }
         });
 
+
         RemoveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 deletePlayList();
+            }
+        });
+
+    }
+
+    public void displayPlaylist() {
+
+        final SyntonesWebAPI syntonesWebAPI = SyntonesWebAPI.Factory.getInstance(sContext);
+        SharedPreferences sharedPrefUserInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+
+        String username = sharedPrefUserInfo.getString("username", "");
+        User user = new User();
+        user.setUsername(username);
+        syntonesWebAPI.getPlaylistFromDB(user).enqueue(new Callback<PlaylistResponse>() {
+            @Override
+            public void onResponse(Call<PlaylistResponse> call, Response<PlaylistResponse> response) {
+
+
+                PlaylistResponse playlistResponse = response.body();
+                List<Playlist> playlists = playlistResponse.getPlaylists();
+
+                for (Playlist a : playlists) {
+
+                    arrayAdapater.add(a.getPlaylistName());
+                    arrayAdapater.notifyDataSetChanged();
+                }
+
+                Log.e("Playlist Response: ", playlistResponse.getMessage().getMessage());
+            }
+
+            @Override
+            public void onFailure(Call<PlaylistResponse> call, Throwable t) {
+
             }
         });
 
@@ -116,9 +153,9 @@ public class PlayListActivity extends AppCompatActivity {
 
                     User user = new User(username);
 
-                    playlist.setPlaylistName(play_list_name);
-                    playlist.setUser(user);
 
+                    playlist.setUser(user);
+                    playlist.setPlaylistName(play_list_name);
 
                     syntonesWebAPI.createPlaylist(playlist);
 
@@ -159,8 +196,60 @@ public class PlayListActivity extends AppCompatActivity {
 
         int position = PlaylistsLv.getCheckedItemPosition();
         if (position > -1) {
+            final String playlist_name = String.valueOf(PlaylistsLv.getItemAtPosition(position));
+            SharedPreferences sharedPrefUserInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+
+            String username = sharedPrefUserInfo.getString("username", "");
+            final User user = new User();
+            user.setUsername(username);
+
+            final SyntonesWebAPI syntonesWebAPI = SyntonesWebAPI.Factory.getInstance(sContext);
+
+            syntonesWebAPI.getPlaylistFromDB(user).enqueue(new Callback<PlaylistResponse>() {
+                @Override
+                public void onResponse(Call<PlaylistResponse> call, Response<PlaylistResponse> response) {
+
+
+                    PlaylistResponse playlistResponse = response.body();
+                    List<Playlist> playlists = playlistResponse.getPlaylists();
+
+                    for (Playlist a : playlists) {
+
+                        if (a.getPlaylistName().equals(playlist_name)) {
+                            Playlist playlist = new Playlist();
+                            playlist.setPlaylistId(a.getPlaylistId());
+                            playlist.setUser(user);
+
+
+                            syntonesWebAPI.removePlaylist(playlist);
+
+                            SyntonesWebAPI.Factory.getInstance(sContext).removePlaylist(playlist).enqueue(new Callback<RemovePlaylistResponse>() {
+                                @Override
+                                public void onResponse(Call<RemovePlaylistResponse> call, Response<RemovePlaylistResponse> response) {
+
+                                }
+
+                                @Override
+                                public void onFailure(Call<RemovePlaylistResponse> call, Throwable t) {
+
+                                }
+                            });
+                        }
+                    }
+
+                    Log.e("Playlist Response: ", playlistResponse.getMessage().getMessage());
+                }
+
+                @Override
+                public void onFailure(Call<PlaylistResponse> call, Throwable t) {
+
+                }
+            });
+
 
             arrayAdapater.remove(play_lists.get(position));
+
+
             arrayAdapater.notifyDataSetChanged();
 
         }

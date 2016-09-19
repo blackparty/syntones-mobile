@@ -11,6 +11,8 @@ import com.syntones.model.Song;
 import com.syntones.model.User;
 import com.syntones.response.LoginResponse;
 import com.syntones.response.PlaylistResponse;
+import com.syntones.response.RemovePlaylistResponse;
+import com.syntones.response.RemoveToPlaylistResponse;
 import com.syntones.response.SongListResponse;
 
 import java.util.List;
@@ -39,7 +41,13 @@ public interface SyntonesWebAPI {
     @POST("savePlaylist")
     Call<PlaylistResponse> createPlaylist(@Body Playlist playlist);
 
-    @GET("songList")
+    @POST("playlist")
+    Call<PlaylistResponse> getPlaylistFromDB(@Body User user);
+
+    @POST("removePlaylist")
+    Call<RemovePlaylistResponse> removePlaylist(@Body Playlist playlist);
+
+    @POST("songList")
     Call<SongListResponse> getAllSongsFromDB();
 
 

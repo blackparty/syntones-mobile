@@ -110,10 +110,5 @@ public class YourLibraryActivity extends AppCompatActivity {
 
     }
 
-    public void viewSongs(View view) {
 
-        Intent intent = new Intent(this, SongsActivity.class);
-        startActivity(intent);
-
-    }
 }

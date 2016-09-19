@@ -117,6 +117,7 @@
                 android:id="@+id/btnShowLyrics"
                 android:layout_gravity="left|top"
                 android:onClick="showLyrics" />
+
         </FrameLayout>
 
         <ListView
@@ -150,6 +151,17 @@
             android:layout_alignStart="@+id/ivPlayBtn"
             android:layout_gravity="center"
             android:layout_marginBottom="80dp" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+"
+            android:id="@+id/btnAddToPlaylist"
+            android:layout_gravity="center"
+            android:layout_marginTop="50dp"
+            android:layout_marginRight="150dp"
+            android:onClick="addToPlaylist" />
 
     </FrameLayout>
 

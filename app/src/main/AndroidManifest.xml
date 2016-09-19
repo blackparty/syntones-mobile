@@ -80,16 +80,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SongsActivity"
-            android:label="Songs"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity
             android:name=".ProfileActivity"
             android:label="Profile"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar">

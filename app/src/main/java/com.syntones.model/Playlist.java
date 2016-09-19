@@ -7,7 +7,8 @@ import java.util.List;
  */
 public class Playlist {
 
-    private Long playlistId;
+
+    private long playlistId;
 
     private String playlistName;
 
@@ -15,45 +16,23 @@ public class Playlist {
 
     private User user;
 
-    private String[] songIdList;
+    private long songId;
 
     public Playlist() {
 
     }
 
-
-    public Playlist(Long playlistId, String playlistName, List<Song> songs, User user, String[] songIdList) {
-        super();
+    public Playlist(long playlistId,long songId){
         this.playlistId = playlistId;
-        this.playlistName = playlistName;
-        this.songs = songs;
-        this.user = user;
-        this.songIdList = songIdList;
+        this.songId = songId;
     }
 
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String[] getSongIdList() {
-        return songIdList;
-    }
-
-    public void setSongIdList(String[] songIdList) {
-        this.songIdList = songIdList;
-    }
-
-    public Long getPlaylistId() {
+    public long getPlaylistId() {
         return playlistId;
     }
 
-    public void setPlayListId(Long playListId) {
-        this.playlistId = playListId;
+    public void setPlaylistId(long playlistId) {
+        this.playlistId = playlistId;
     }
 
     public String getPlaylistName() {
@@ -64,25 +43,28 @@ public class Playlist {
         this.playlistName = playlistName;
     }
 
-
-    public void setPlaylistId(Long playlistId) {
-        this.playlistId = playlistId;
-    }
-
-
     public List<Song> getSongs() {
         return songs;
     }
-
 
     public void setSongs(List<Song> songs) {
         this.songs = songs;
     }
 
+    public User getUser() {
+        return user;
+    }
 
-    @Override
-    public String toString() {
-        return "Playlist [playlistId=" + playlistId + ", playlistName=" + playlistName + ", songs=" + songs + "]";
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public long getSongId() {
+        return songId;
+    }
+
+    public void setSongId(long songId) {
+        this.songId = songId;
     }
 
 
