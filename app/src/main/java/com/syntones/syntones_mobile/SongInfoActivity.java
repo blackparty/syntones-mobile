@@ -37,7 +37,7 @@ public class SongInfoActivity extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     private ImageView PlayBtnIv, PauseBtnIv, PreviousBtnIv, NextBtnIv;
     private int counter, length;
-    private Button ShowLyricsBtn;
+    private Button ShowLyricsBtn, AddToPlaylistBtn;
     private SongInfoActivity sContext;
 
 
@@ -55,12 +55,15 @@ public class SongInfoActivity extends AppCompatActivity {
         SongTitleTv = (TextView) findViewById(R.id.tvSongTitle);
         ArtistNameTv = (TextView) findViewById(R.id.tvArtistName);
         ShowLyricsBtn = (Button) findViewById(R.id.btnShowLyrics);
+        AddToPlaylistBtn = (Button) findViewById(R.id.btnAddToPlaylist);
 
 
-        Bundle extras = getIntent().getExtras();
-        String[] song_info = extras.get("SongInfo").toString().split("\\s(by)\\s");
-        SongTitleTv.setText(song_info[0]);
-        ArtistNameTv.setText(song_info[1]);
+        SharedPreferences sharedPrefSongInfo = getSharedPreferences("songInfo", Context.MODE_PRIVATE);
+
+        String songTitle = sharedPrefSongInfo.getString("songTitle", "");
+        String artistName = sharedPrefSongInfo.getString("artistName", "");
+        SongTitleTv.setText(songTitle);
+        ArtistNameTv.setText(artistName);
 
         PlayBtnIv.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,8 +112,46 @@ public class SongInfoActivity extends AppCompatActivity {
             }
         });
 
+        AddToPlaylistBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addToPlaylist();
+            }
+        });
+
     }
 
+
+    public void addToPlaylist() {
+
+        SyntonesWebAPI syntonesWebAPI = SyntonesWebAPI.Factory.getInstance(sContext);
+
+        syntonesWebAPI.getAllSongsFromDB().enqueue(new Callback<SongListResponse>() {
+            @Override
+            public void onResponse(Call<SongListResponse> call, Response<SongListResponse> response) {
+                SongListResponse songListResponse = response.body();
+                List<Song> songList = songListResponse.getSongs();
+                for (Song a : songList) {
+
+                    if (a.getSongTitle().equals(SongTitleTv.getText().toString()) && a.getArtist().getArtistName().equals(ArtistNameTv.getText().toString())) {
+
+
+                        Intent intent = new Intent(SongInfoActivity.this, PlayListActivity.class);
+                        intent.putExtra("SongId", a.getSongId());
+                        startActivity(intent);
+
+                        Log.e("Song List Response ", songListResponse.getMessage().getMessage());
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SongListResponse> call, Throwable t) {
+
+            }
+        });
+
+    }
 
     public void playBtn() {
         try {
@@ -197,16 +238,14 @@ public class SongInfoActivity extends AppCompatActivity {
                 List<Song> songList = songListResponse.getSongs();
                 for (Song s : songList) {
 
-                    if (s.getSongTitle().equals(SongTitleTv.getText()) && s.getArtist().getArtistName().equals(ArtistNameTv.getText())) {
+                    if (s.getSongTitle().equals(SongTitleTv.getText().toString()) && s.getArtist().getArtistName().equals(ArtistNameTv.getText().toString())) {
 
                         song_lyrics = s.getSongLyrics().toString();
+                        SharedPreferences sharedPrefSongInfo = getSharedPreferences("songInfo", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editorSongInfo = sharedPrefSongInfo.edit();
+                        editorSongInfo.putString("songLyrics", song_lyrics);
+                        editorSongInfo.commit();
 
-
-                        SharedPreferences sharedPrefSongLyrics= getSharedPreferences("songLyrics", Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editorSongLyrics = sharedPrefSongLyrics.edit();
-
-                        editorSongLyrics.putString("lyrics", song_lyrics);
-                        editorSongLyrics.commit();
                         Toast.makeText(getBaseContext(), song_lyrics, Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(SongInfoActivity.this, LyricsActivity.class);
                         startActivity(intent);
@@ -215,7 +254,7 @@ public class SongInfoActivity extends AppCompatActivity {
 
                 }
 
-                Log.e("Song List Response:", songListResponse.getMessage().getMessage().toString());
+                Log.e("Song List Response:", songListResponse.getMessage().getMessage());
             }
 
 

@@ -7,8 +7,10 @@ package com.syntones.remote;
 import android.content.Context;
 
 import com.syntones.model.Playlist;
+import com.syntones.model.PlaylistSong;
 import com.syntones.model.Song;
 import com.syntones.model.User;
+import com.syntones.response.LibraryResponse;
 import com.syntones.response.LoginResponse;
 import com.syntones.response.PlaylistResponse;
 import com.syntones.response.RemovePlaylistResponse;
@@ -47,9 +49,11 @@ public interface SyntonesWebAPI {
     @POST("removePlaylist")
     Call<RemovePlaylistResponse> removePlaylist(@Body Playlist playlist);
 
-    @POST("songList")
+    @GET("songlist")
     Call<SongListResponse> getAllSongsFromDB();
 
+    @POST("addToPlaylist")
+    Call<LibraryResponse> addToPlaylist(@Body PlaylistSong playlistSong);
 
     class Factory {
 

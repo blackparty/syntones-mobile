@@ -1,6 +1,8 @@
 package com.syntones.syntones_mobile;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.util.SortedList;
@@ -58,8 +60,18 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String song = String.valueOf(parent.getItemAtPosition(position));
+
+                SharedPreferences sharedPrefSongInfo = getSharedPreferences("songInfo", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editorSongInfo = sharedPrefSongInfo.edit();
+
+                String[] song_info = song.split("\\s(by)\\s");
+
+                editorSongInfo.putString("songTitle", song_info[0]);
+                editorSongInfo.putString("artistName", song_info[1]);
+
+                editorSongInfo.commit();
+
                 Intent intent = new Intent(SearchActivity.this, SongInfoActivity.class);
-                intent.putExtra("SongInfo", song);
                 startActivity(intent);
                 Toast.makeText(getBaseContext(), song, Toast.LENGTH_SHORT).show();
             }
@@ -77,7 +89,7 @@ public class SearchActivity extends AppCompatActivity {
                 SongListResponse songListResponse = response.body();
                 List<Song> songList = songListResponse.getSongs();
                 for (Song s : songList) {
-                    arrayAdapater.add(s.getSongTitle() + "\nby " + s.getArtist().getArtistName() + "\n" + s.getSongLyrics());
+                    arrayAdapater.add(s.getSongTitle() + "\nby " + s.getArtist().getArtistName());
                     arrayAdapater.notifyDataSetChanged();
 
                 }

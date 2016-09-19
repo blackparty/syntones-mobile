@@ -48,30 +48,6 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Songs"
-        android:id="@+id/textView7"
-        android:textColor="#FFFFFF"
-        android:textSize="18dp"
-        android:layout_below="@+id/tvViewPlaylists"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="23dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=">"
-        android:id="@+id/tvViewSongs"
-        android:textColor="#FFFFFF"
-        android:textSize="20dp"
-        android:layout_alignTop="@+id/textView7"
-        android:layout_alignLeft="@+id/tvViewPlaylists"
-        android:layout_alignStart="@+id/tvViewPlaylists"
-        android:onClick="viewSongs"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:text="Recently Played"
         android:id="@+id/textView9"
         android:textColor="#FFFFFF"

@@ -22,9 +22,9 @@ public class LyricsActivity extends AppCompatActivity {
 
         HideLyricsBtn = (Button) findViewById(R.id.btnHideLyrics);
         LyricsTv = (TextView) findViewById(R.id.tvLyrics);
-        SharedPreferences sharedPrefSongLyrics = getSharedPreferences("songLyrics", Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefSongInfo = getSharedPreferences("songInfo", Context.MODE_PRIVATE);
 
-        String song_lyrics = sharedPrefSongLyrics.getString("lyrics", "");
+        String song_lyrics = sharedPrefSongInfo.getString("songLyrics", "");
 
         LyricsTv.setText(song_lyrics);
 
