@@ -71,6 +71,11 @@ public class SearchActivity extends AppCompatActivity {
 
                 editorSongInfo.commit();
 
+                SharedPreferences sharedPrefActivityInfo = getSharedPreferences("activityInfo", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editorActivityInfo = sharedPrefActivityInfo.edit();
+                editorActivityInfo.putString("activityState", "SearchActivity");
+                editorActivityInfo.commit();
+
                 Intent intent = new Intent(SearchActivity.this, SongInfoActivity.class);
                 startActivity(intent);
                 Toast.makeText(getBaseContext(), song, Toast.LENGTH_SHORT).show();
@@ -95,7 +100,7 @@ public class SearchActivity extends AppCompatActivity {
                 }
 
 
-                Log.e("Song List Response:", songListResponse.getMessage().toString());
+                Log.e("Song List Response:", songListResponse.getMessage().getMessage());
             }
 
 

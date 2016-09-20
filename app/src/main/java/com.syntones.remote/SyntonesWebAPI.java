@@ -13,11 +13,13 @@ import com.syntones.model.User;
 import com.syntones.response.LibraryResponse;
 import com.syntones.response.LoginResponse;
 import com.syntones.response.PlaylistResponse;
+import com.syntones.response.PlaylistSongsResponse;
 import com.syntones.response.RemovePlaylistResponse;
 import com.syntones.response.RemoveToPlaylistResponse;
 import com.syntones.response.SongListResponse;
 
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -54,6 +56,10 @@ public interface SyntonesWebAPI {
 
     @POST("addToPlaylist")
     Call<LibraryResponse> addToPlaylist(@Body PlaylistSong playlistSong);
+
+    @POST("playlistSong")
+    Call<PlaylistSongsResponse> getSongsPlaylist(@Body Map<String, String> data);
+
 
     class Factory {
 

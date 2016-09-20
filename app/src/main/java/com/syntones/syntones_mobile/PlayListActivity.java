@@ -54,72 +54,128 @@ public class PlayListActivity extends AppCompatActivity {
 
         this.displayPlaylist();
 
-        Bundle extras = getIntent().getExtras();
-        final long songId = Long.parseLong(extras.get("SongId").toString());
 
-        PlaylistsLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                play_lists.get(position);
+        SharedPreferences sharedPrefButtonInfo = getSharedPreferences("buttonInfo", Context.MODE_PRIVATE);
+        String buttonStatus = sharedPrefButtonInfo.getString("buttonStatus", "");
 
-                final SyntonesWebAPI syntonesWebAPI = SyntonesWebAPI.Factory.getInstance(sContext);
-                SharedPreferences sharedPrefUserInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-                final String playlist_name = String.valueOf(PlaylistsLv.getItemAtPosition(position));
-                String username = sharedPrefUserInfo.getString("username", "");
-                final User user = new User();
-                user.setUsername(username);
-                syntonesWebAPI.getPlaylistFromDB(user).enqueue(new Callback<PlaylistResponse>() {
-                    @Override
-                    public void onResponse(Call<PlaylistResponse> call, Response<PlaylistResponse> response) {
+        if (buttonStatus.equals("addToPlaylist")) {
 
+            Bundle extras = getIntent().getExtras();
+            final long songId = Long.parseLong(extras.get("SongId").toString());
 
-                        PlaylistResponse playlistResponse = response.body();
-                        List<Playlist> playlists = playlistResponse.getPlaylists();
+            PlaylistsLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                    play_lists.get(position);
 
-                        for (Playlist a : playlists) {
-
-                            if (a.getPlaylistName().equals(playlist_name)) {
-
-                                PlaylistSong playlistSong = new PlaylistSong();
-                                playlistSong.setSongId(songId);
-                                playlistSong.setPlaylistId(a.getPlaylistId());
-                                playlistSong.setUser(user);
-
-                                syntonesWebAPI.addToPlaylist(playlistSong);
-
-                                SyntonesWebAPI.Factory.getInstance(sContext).addToPlaylist(playlistSong).enqueue(new Callback<LibraryResponse>() {
-                                    @Override
-                                    public void onResponse(Call<LibraryResponse> call, Response<LibraryResponse> response) {
-                                        LibraryResponse libraryResponse = response.body();
-
-                                        Intent intent = new Intent(PlayListActivity.this, SongInfoActivity.class);
-
-                                        startActivity(intent);
-                                        Log.e("Library Response: ", libraryResponse.getMessage().getMessage());
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<LibraryResponse> call, Throwable t) {
-
-                                    }
-                                });
+                    final SyntonesWebAPI syntonesWebAPI = SyntonesWebAPI.Factory.getInstance(sContext);
+                    SharedPreferences sharedPrefUserInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+                    final String playlist_name = String.valueOf(PlaylistsLv.getItemAtPosition(position));
+                    String username = sharedPrefUserInfo.getString("username", "");
+                    final User user = new User();
+                    user.setUsername(username);
+                    syntonesWebAPI.getPlaylistFromDB(user).enqueue(new Callback<PlaylistResponse>() {
+                        @Override
+                        public void onResponse(Call<PlaylistResponse> call, Response<PlaylistResponse> response) {
 
 
+                            PlaylistResponse playlistResponse = response.body();
+                            List<Playlist> playlists = playlistResponse.getPlaylists();
+
+                            for (Playlist a : playlists) {
+
+                                if (a.getPlaylistName().equals(playlist_name)) {
+
+                                    PlaylistSong playlistSong = new PlaylistSong();
+                                    playlistSong.setSongId(songId);
+                                    playlistSong.setPlaylistId(a.getPlaylistId());
+                                    playlistSong.setUser(user);
+
+                                    syntonesWebAPI.addToPlaylist(playlistSong);
+
+                                    SyntonesWebAPI.Factory.getInstance(sContext).addToPlaylist(playlistSong).enqueue(new Callback<LibraryResponse>() {
+                                        @Override
+                                        public void onResponse(Call<LibraryResponse> call, Response<LibraryResponse> response) {
+                                            LibraryResponse libraryResponse = response.body();
+
+                                            Intent intent = new Intent(PlayListActivity.this, SongInfoActivity.class);
+
+                                            startActivity(intent);
+                                            Log.e("Library Response: ", libraryResponse.getMessage().getMessage());
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<LibraryResponse> call, Throwable t) {
+
+                                        }
+                                    });
+
+
+                                }
                             }
+
+                            Log.e("Playlist Response: ", playlistResponse.getMessage().getMessage());
                         }
 
-                        Log.e("Playlist Response: ", playlistResponse.getMessage().getMessage());
-                    }
+                        @Override
+                        public void onFailure(Call<PlaylistResponse> call, Throwable t) {
 
-                    @Override
-                    public void onFailure(Call<PlaylistResponse> call, Throwable t) {
-
-                    }
-                });
+                        }
+                    });
 
 
-            }
-        });
+                }
+            });
+        } else {
+
+            PlaylistsLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                    play_lists.get(position);
+
+                    final SyntonesWebAPI syntonesWebAPI = SyntonesWebAPI.Factory.getInstance(sContext);
+                    SharedPreferences sharedPrefUserInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+                    final String playlist_name = String.valueOf(PlaylistsLv.getItemAtPosition(position));
+                    String username = sharedPrefUserInfo.getString("username", "");
+                    final User user = new User();
+                    user.setUsername(username);
+                    syntonesWebAPI.getPlaylistFromDB(user).enqueue(new Callback<PlaylistResponse>() {
+                        @Override
+                        public void onResponse(Call<PlaylistResponse> call, Response<PlaylistResponse> response) {
+
+
+                            PlaylistResponse playlistResponse = response.body();
+                            List<Playlist> playlists = playlistResponse.getPlaylists();
+
+                            for (Playlist a : playlists) {
+
+                                if (a.getPlaylistName().equals(playlist_name)) {
+                                    Intent intent = new Intent(PlayListActivity.this, ViewPlayListActivity.class);
+                                    SharedPreferences sharedPrefPlaylistInfo = getSharedPreferences("playlistInfo", Context.MODE_PRIVATE);
+                                    SharedPreferences.Editor editorPlaylistInfo = sharedPrefPlaylistInfo.edit();
+                                    editorPlaylistInfo.putString("playlistName", playlist_name);
+                                    editorPlaylistInfo.putString("playlistId", String.valueOf(a.getPlaylistId()));
+                                    editorPlaylistInfo.commit();
+                                    startActivity(intent);
+                                }
+                            }
+
+
+                            Log.e("Playlist Response: ", playlistResponse.getMessage().getMessage());
+                        }
+
+                        @Override
+                        public void onFailure(Call<PlaylistResponse> call, Throwable t) {
+
+                        }
+                    });
+
+
+                }
+            });
+
+
+        }
 
 
         RemoveBtn.setOnClickListener(new View.OnClickListener() {

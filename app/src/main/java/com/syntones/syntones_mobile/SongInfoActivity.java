@@ -33,7 +33,7 @@ public class SongInfoActivity extends AppCompatActivity {
     final String songs_urls[] = {"http://project-tango.org/Projects/TangoBand/Songs/files/01%20La%20Cumparsita.mp3", "http://project-tango.org/Projects/TangoBand/Songs/files/Silueta%20Portena.mp3"};
 
 
-    private TextView SongTitleTv, ArtistNameTv;
+    private TextView SongTitleTv, ArtistNameTv, BackToPlaylist;
     private MediaPlayer mediaPlayer;
     private ImageView PlayBtnIv, PauseBtnIv, PreviousBtnIv, NextBtnIv;
     private int counter, length;
@@ -56,6 +56,7 @@ public class SongInfoActivity extends AppCompatActivity {
         ArtistNameTv = (TextView) findViewById(R.id.tvArtistName);
         ShowLyricsBtn = (Button) findViewById(R.id.btnShowLyrics);
         AddToPlaylistBtn = (Button) findViewById(R.id.btnAddToPlaylist);
+        BackToPlaylist = (TextView) findViewById(R.id.tvBackToSongList) ;
 
 
         SharedPreferences sharedPrefSongInfo = getSharedPreferences("songInfo", Context.MODE_PRIVATE);
@@ -64,6 +65,11 @@ public class SongInfoActivity extends AppCompatActivity {
         String artistName = sharedPrefSongInfo.getString("artistName", "");
         SongTitleTv.setText(songTitle);
         ArtistNameTv.setText(artistName);
+
+        SharedPreferences sharedPrefButtonInfo = getSharedPreferences("buttonInfo", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editorButtonInfo= sharedPrefButtonInfo.edit();
+        editorButtonInfo.putString("buttonStatus", "notAddedToPlaylist");
+        editorButtonInfo.commit();
 
         PlayBtnIv.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,6 +111,15 @@ public class SongInfoActivity extends AppCompatActivity {
             }
         });
 
+        BackToPlaylist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                backToPlaylist();
+            }
+        });
+
+
+
         ShowLyricsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -135,6 +150,10 @@ public class SongInfoActivity extends AppCompatActivity {
 
                     if (a.getSongTitle().equals(SongTitleTv.getText().toString()) && a.getArtist().getArtistName().equals(ArtistNameTv.getText().toString())) {
 
+                        SharedPreferences sharedPrefButtonInfo = getSharedPreferences("buttonInfo", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editorButtonInfo = sharedPrefButtonInfo.edit();
+                        editorButtonInfo.putString("buttonStatus", "addToPlaylist");
+                        editorButtonInfo.commit();
 
                         Intent intent = new Intent(SongInfoActivity.this, PlayListActivity.class);
                         intent.putExtra("SongId", a.getSongId());
@@ -267,6 +286,17 @@ public class SongInfoActivity extends AppCompatActivity {
             }
         });
 
+
+    }
+
+    public void backToPlaylist(){
+        SharedPreferences sharedPrefActivityInfo = getSharedPreferences("activityInfo", Context.MODE_PRIVATE);
+        String activityState = sharedPrefActivityInfo.getString("activityState", "");
+
+        if(activityState.equals("SearchActivity")){
+            Intent intent = new Intent(SongInfoActivity.this, SearchActivity.class);
+            startActivity(intent);
+        }
 
     }
 
