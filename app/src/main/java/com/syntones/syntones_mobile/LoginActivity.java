@@ -68,7 +68,6 @@ public class LoginActivity extends AppCompatActivity {
                 SharedPreferences.Editor editorUserInfo = sharedPrefUserInfo.edit();
 
                 LoginResponse loginResponse = response.body();
-                List<Playlist> playlist = loginResponse.getRecentlyPlayedPlaylists();
 
                 editorUserInfo.putString("username", username);
                 editorUserInfo.commit();
@@ -76,7 +75,7 @@ public class LoginActivity extends AppCompatActivity {
                 Intent intent = new Intent(LoginActivity.this, YourLibraryActivity.class);
                 startActivity(intent);
 
-                Log.e("Login Response: ", String.valueOf(loginResponse.getMessage().getFlag()));
+//                Log.e("Login Response: ", loginResponse.getMessage().getMessage());
 
             }
 

@@ -37,7 +37,7 @@ import retrofit2.Response;
 public class PlayListActivity extends AppCompatActivity {
     private PlayListActivity sContext;
     ArrayList<String> play_lists = new ArrayList<>();
-    ArrayAdapter<String> arrayAdapater;
+    ArrayAdapter<String> arrayAdapter;
     EditText PlayListNameEt;
     ListView PlaylistsLv;
     Button RemoveBtn;
@@ -48,8 +48,8 @@ public class PlayListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_play_list);
 
         PlaylistsLv = (ListView) findViewById(R.id.lvPlaylists);
-        arrayAdapater = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_single_choice, play_lists);
-        PlaylistsLv.setAdapter(arrayAdapater);
+        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_single_choice, play_lists);
+        PlaylistsLv.setAdapter(arrayAdapter);
         RemoveBtn = (Button) findViewById(R.id.btnRemove);
 
         this.displayPlaylist();
@@ -205,8 +205,8 @@ public class PlayListActivity extends AppCompatActivity {
 
                 for (Playlist a : playlists) {
 
-                    arrayAdapater.add(a.getPlaylistName());
-                    arrayAdapater.notifyDataSetChanged();
+                    arrayAdapter.add(a.getPlaylistName());
+                    arrayAdapter.notifyDataSetChanged();
                 }
 
                 Log.e("Playlist Response: ", playlistResponse.getMessage().getMessage());
@@ -293,8 +293,8 @@ public class PlayListActivity extends AppCompatActivity {
                             Log.e("Failed", t.getMessage());
                         }
                     });
-                    arrayAdapater.add(play_list_name);
-                    arrayAdapater.notifyDataSetChanged();
+                    arrayAdapter.add(play_list_name);
+                    arrayAdapter.notifyDataSetChanged();
 
                 }
                 dialog.cancel();
@@ -366,10 +366,10 @@ public class PlayListActivity extends AppCompatActivity {
             });
 
 
-            arrayAdapater.remove(play_lists.get(position));
+            arrayAdapter.remove(play_lists.get(position));
 
 
-            arrayAdapater.notifyDataSetChanged();
+            arrayAdapter.notifyDataSetChanged();
 
         }
     }

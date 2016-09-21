@@ -1,5 +1,7 @@
 package com.syntones.model;
 
+import java.io.File;
+
 /**
  * Created by Courtney Love on 9/12/2016.
  */
@@ -11,35 +13,56 @@ public class Song {
 
     private String artistName;
 
-    private String songLyrics;
+    private int distance;
+
+    private File file;
+
+    // connects the song to the artist class
 
     private Artist artist;
+
+    private String lyrics = "";
+
+    private String filePath;
 
     public Song() {
     }
 
-    public Song(long songId, String songTitle, String artistName, String songLyrics, Artist artist) {
-        this.songId = songId;
-        this.songTitle = songTitle;
-        this.artistName = artistName;
-        this.songLyrics = songLyrics;
+    public void setFile(File file) {
+        this.file = file;
+    }
+
+    public void setArtist(Artist artist) {
         this.artist = artist;
+    }
+
+    public Song(String songTitle, String artistName) {
+        this.artistName = artistName;
+        this.songTitle = songTitle;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public String getLyrics() {
+        return lyrics;
     }
 
     public long getSongId() {
         return songId;
     }
 
-    public void setSongId(long songId) {
-        this.songId = songId;
-    }
-
     public String getSongTitle() {
         return songTitle;
     }
 
-    public void setSongTitle(String songTitle) {
-        this.songTitle = songTitle;
+    public Artist getArtist() {
+        return artist;
     }
 
     public String getArtistName() {
@@ -50,19 +73,28 @@ public class Song {
         this.artistName = artistName;
     }
 
-    public Artist getArtist() {
-        return artist;
+    public void setSongTitle(String songTitle) {
+        this.songTitle = songTitle;
     }
 
-    public void setArtist(Artist artist) {
-        this.artist = artist;
+    public void setDistance(int distance) {
+        this.distance = distance;
     }
 
-    public String getSongLyrics() {
-        return songLyrics;
+    public int getDistance() {
+        return this.distance;
     }
 
-    public void setSongLyrics(String songLyrics) {
-        this.songLyrics = songLyrics;
+    public void setLyrics(String lyrics) {
+        this.lyrics = lyrics;
     }
+
+    public File getFile() {
+        return file;
+    }
+
+    public void setSongId(long songId) {
+        this.songId = songId;
+    }
+
 }

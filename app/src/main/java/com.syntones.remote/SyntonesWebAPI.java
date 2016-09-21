@@ -60,6 +60,9 @@ public interface SyntonesWebAPI {
     @POST("playlistSong")
     Call<PlaylistSongsResponse> getSongsPlaylist(@Body Map<String, String> data);
 
+    @POST("removeToPlaylist")
+    Call<RemovePlaylistResponse> removeSongFromPlaylist(@Body PlaylistSong playlistSong);
+
 
     class Factory {
 

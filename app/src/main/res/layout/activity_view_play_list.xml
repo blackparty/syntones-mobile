@@ -46,6 +46,22 @@
                 android:textColor="#FFFFFF"
                 android:id="@+id/tvPlaylistName" />
 
+            <Button
+                android:text="Edit"
+                android:layout_width="77dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/btnEditSong"
+                android:layout_marginLeft="230dp"
+                android:onClick="editSong" />
+
+            <Button
+                android:text="Remove"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btnRemoveSong"
+                android:onClick="removeSong"
+                android:visibility="invisible" />
+
             <ListView
                 android:layout_width="match_parent"
                 android:layout_height="300dp"

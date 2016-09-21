@@ -15,9 +15,6 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.syntones.model.Product;
 import com.syntones.model.Song;
 import com.syntones.remote.SyntonesWebAPI;
 import com.syntones.response.SongListResponse;
@@ -78,7 +75,7 @@ public class SearchActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(SearchActivity.this, SongInfoActivity.class);
                 startActivity(intent);
-                Toast.makeText(getBaseContext(), song, Toast.LENGTH_SHORT).show();
+
             }
         });
     }

@@ -147,7 +147,7 @@
             android:src="@drawable/ic_pause_circle_outline_black_24dp"
             android:visibility="invisible"
             android:onClick="pauseBtn"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="10dp"
             android:layout_below="@+id/ivPlayBtn"
             android:layout_alignLeft="@+id/ivPlayBtn"
             android:layout_alignStart="@+id/ivPlayBtn"

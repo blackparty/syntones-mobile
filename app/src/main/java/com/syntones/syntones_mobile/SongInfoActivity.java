@@ -16,12 +16,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.syntones.model.Playlist;
 import com.syntones.model.Song;
 import com.syntones.remote.SyntonesWebAPI;
+import com.syntones.response.PlaylistSongsResponse;
 import com.syntones.response.SongListResponse;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
@@ -30,8 +35,6 @@ import retrofit2.Response;
 
 public class SongInfoActivity extends AppCompatActivity {
 
-    final String songs_urls[] = {"http://project-tango.org/Projects/TangoBand/Songs/files/01%20La%20Cumparsita.mp3", "http://project-tango.org/Projects/TangoBand/Songs/files/Silueta%20Portena.mp3"};
-
 
     private TextView SongTitleTv, ArtistNameTv, BackToPlaylist;
     private MediaPlayer mediaPlayer;
@@ -39,12 +42,39 @@ public class SongInfoActivity extends AppCompatActivity {
     private int counter, length;
     private Button ShowLyricsBtn, AddToPlaylistBtn;
     private SongInfoActivity sContext;
+    private List<Song> songList;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song_info);
+
+        SharedPreferences sharedPrefPlaylistInfo = getSharedPreferences("playlistInfo", Context.MODE_PRIVATE);
+        long playlist_id = Long.parseLong(sharedPrefPlaylistInfo.getString("playlistId", ""));
+
+
+        SharedPreferences sharedPrefActivityInfo = getSharedPreferences("activityInfo", Context.MODE_PRIVATE);
+        final String activityState = sharedPrefActivityInfo.getString("activityState", "");
+
+        SharedPreferences sharedPrefPlayedSongInfo = getSharedPreferences("playedSongInfo", 0);
+        final int size = sharedPrefPlayedSongInfo.getInt("song_url_array" + "_size", 0);
+
+        final String[] songs_urls = new String[size];
+        final String[] songs_titles = new String[size];
+        final String[] songs_artists = new String[size];
+        final String[] songs_lyrics = new String[size];
+
+        if (activityState.equals("Playlist")) {
+
+            for (int a = 0; a < songs_urls.length; a++) {
+                songs_urls[a] = sharedPrefPlayedSongInfo.getString("song_url_array" + "_" + a, null);
+                songs_titles[a] = sharedPrefPlayedSongInfo.getString("song_titles_array" + "_" + a, null);
+                songs_artists[a] = sharedPrefPlayedSongInfo.getString("song_artists_array" + "_" + a, null);
+                songs_lyrics[a] = sharedPrefPlayedSongInfo.getString("song_lyrics_array" + "_" + a, null);
+            }
+        }
+
 
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -56,7 +86,7 @@ public class SongInfoActivity extends AppCompatActivity {
         ArtistNameTv = (TextView) findViewById(R.id.tvArtistName);
         ShowLyricsBtn = (Button) findViewById(R.id.btnShowLyrics);
         AddToPlaylistBtn = (Button) findViewById(R.id.btnAddToPlaylist);
-        BackToPlaylist = (TextView) findViewById(R.id.tvBackToSongList) ;
+        BackToPlaylist = (TextView) findViewById(R.id.tvBackToSongList);
 
 
         SharedPreferences sharedPrefSongInfo = getSharedPreferences("songInfo", Context.MODE_PRIVATE);
@@ -67,14 +97,14 @@ public class SongInfoActivity extends AppCompatActivity {
         ArtistNameTv.setText(artistName);
 
         SharedPreferences sharedPrefButtonInfo = getSharedPreferences("buttonInfo", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editorButtonInfo= sharedPrefButtonInfo.edit();
+        SharedPreferences.Editor editorButtonInfo = sharedPrefButtonInfo.edit();
         editorButtonInfo.putString("buttonStatus", "notAddedToPlaylist");
         editorButtonInfo.commit();
 
         PlayBtnIv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                playBtn();
+                playBtn(songs_urls, songs_titles, songs_artists, size);
             }
         });
 
@@ -82,7 +112,7 @@ public class SongInfoActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
-                    pauseBtn();
+                    pauseBtn(songs_urls, songs_titles, songs_artists, size);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -93,7 +123,7 @@ public class SongInfoActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
-                    previousBtn();
+                    previousBtn(songs_urls, songs_titles, songs_artists, size);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -104,7 +134,7 @@ public class SongInfoActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
-                    nextBtn();
+                    nextBtn(songs_urls, songs_titles, songs_artists, size);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -119,11 +149,10 @@ public class SongInfoActivity extends AppCompatActivity {
         });
 
 
-
         ShowLyricsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showLyrics();
+                showLyrics(activityState, songs_lyrics);
             }
         });
 
@@ -172,129 +201,138 @@ public class SongInfoActivity extends AppCompatActivity {
 
     }
 
-    public void playBtn() {
-        try {
+    public void playBtn(String[] songs_urls, String[] songs_titles, String[] songs_artists, int size) {
 
-            if (counter == 0) {
-                SongTitleTv.setText("La Cumparista");
-            } else {
-                SongTitleTv.setText("Silueta Portina");
-            }
+        SongTitleTv.setText(songs_titles[counter]);
+        ArtistNameTv.setText(songs_artists[counter]);
 
 
-            mediaPlayer.setDataSource(songs_urls[counter]);
+//            mediaPlayer.setDataSource(songs_urls[counter]);
+//
+//            mediaPlayer.prepare();
+//            mediaPlayer.start();
 
-            mediaPlayer.prepare();
-            mediaPlayer.start();
 
-
-            PlayBtnIv.setVisibility(View.INVISIBLE);
-            PauseBtnIv.setVisibility(View.VISIBLE);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        PlayBtnIv.setVisibility(View.INVISIBLE);
+        PauseBtnIv.setVisibility(View.VISIBLE);
     }
 
 
-    public void pauseBtn() throws IOException {
-        if (counter == 0) {
-            SongTitleTv.setText("La Cumparista");
-        } else {
-            SongTitleTv.setText("Silueta Portina");
-        }
+    public void pauseBtn(String[] songs_urls, String[] songs_titles, String[] songs_artists, int size) throws IOException {
+        SongTitleTv.setText(songs_titles[counter]);
+        ArtistNameTv.setText(songs_artists[counter]);
 
-        length = mediaPlayer.getCurrentPosition();
-        mediaPlayer.pause();
-        mediaPlayer.setDataSource(songs_urls[counter]);
+//        length = mediaPlayer.getCurrentPosition();
+//        mediaPlayer.pause();
+//        mediaPlayer.setDataSource(songs_urls[counter]);
+
         PlayBtnIv.setVisibility(View.VISIBLE);
         PauseBtnIv.setVisibility(View.INVISIBLE);
     }
 
-    public void previousBtn() throws IOException {
+    public void previousBtn(String[] songs_urls, String[] songs_titles, String[] songs_artists, int size) throws IOException {
 
         if (counter > 0) {
             counter = counter - 1;
 
-            mediaPlayer.reset();
             if (counter == 0) {
-                SongTitleTv.setText("La Cumparista");
-            } else {
-                SongTitleTv.setText("Silueta Portina");
+
+                counter = 0;
             }
-            mediaPlayer.setDataSource(songs_urls[counter]);
-            mediaPlayer.prepare();
-            mediaPlayer.start();
+//            mediaPlayer.reset();
+
+            SongTitleTv.setText(songs_titles[counter]);
+            ArtistNameTv.setText(songs_artists[counter]);
+
+//            mediaPlayer.setDataSource(songs_urls[counter]);
+//            mediaPlayer.prepare();
+//            mediaPlayer.start();
         }
     }
 
-    public void nextBtn() throws IOException {
+    public void nextBtn(String[] songs_urls, String[] songs_titles, String[] songs_artists, int size) throws IOException {
         if (counter < songs_urls.length) {
 
             counter = counter + 1;
 
-            mediaPlayer.reset();
-            if (counter == 0) {
-                SongTitleTv.setText("La Cumparista");
-            } else {
-                SongTitleTv.setText("Silueta Portina");
+            if (counter == songs_urls.length) {
+
+                counter = 0;
             }
-            mediaPlayer.setDataSource(songs_urls[counter]);
-            mediaPlayer.prepare();
-            mediaPlayer.start();
+//            mediaPlayer.reset();
+
+            SongTitleTv.setText(songs_titles[counter]);
+            ArtistNameTv.setText(songs_artists[counter]);
+
+//            mediaPlayer.setDataSource(songs_urls[counter]);
+//            mediaPlayer.prepare();
+//            mediaPlayer.start();
         }
     }
 
-    public void showLyrics() {
+    public void showLyrics(String activityState, String[] song_lyrics) {
 
+        if (activityState.equals("Playlist")) {
 
-        final SyntonesWebAPI syntonesWebAPI = SyntonesWebAPI.Factory.getInstance(sContext);
+            SharedPreferences sharedPrefSongInfo = getSharedPreferences("songInfo", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editorSongInfo = sharedPrefSongInfo.edit();
+            editorSongInfo.putString("songLyrics", song_lyrics[counter]);
+            editorSongInfo.commit();
 
-        syntonesWebAPI.getAllSongsFromDB().enqueue(new Callback<SongListResponse>() {
-            @Override
-            public void onResponse(Call<SongListResponse> call, Response<SongListResponse> response) {
-                String song_lyrics;
-                SongListResponse songListResponse = response.body();
-                List<Song> songList = songListResponse.getSongs();
-                for (Song s : songList) {
+            Intent intent = new Intent(SongInfoActivity.this, LyricsActivity.class);
+            startActivity(intent);
+        } else {
+            final SyntonesWebAPI syntonesWebAPI = SyntonesWebAPI.Factory.getInstance(sContext);
 
-                    if (s.getSongTitle().equals(SongTitleTv.getText().toString()) && s.getArtist().getArtistName().equals(ArtistNameTv.getText().toString())) {
+            syntonesWebAPI.getAllSongsFromDB().enqueue(new Callback<SongListResponse>() {
+                @Override
+                public void onResponse(Call<SongListResponse> call, Response<SongListResponse> response) {
+                    String song_lyrics;
+                    SongListResponse songListResponse = response.body();
+                    List<Song> songList = songListResponse.getSongs();
+                    for (Song s : songList) {
 
-                        song_lyrics = s.getSongLyrics().toString();
-                        SharedPreferences sharedPrefSongInfo = getSharedPreferences("songInfo", Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editorSongInfo = sharedPrefSongInfo.edit();
-                        editorSongInfo.putString("songLyrics", song_lyrics);
-                        editorSongInfo.commit();
+                        if (s.getSongTitle().equals(SongTitleTv.getText().toString()) && s.getArtist().getArtistName().equals(ArtistNameTv.getText().toString())) {
 
-                        Toast.makeText(getBaseContext(), song_lyrics, Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(SongInfoActivity.this, LyricsActivity.class);
-                        startActivity(intent);
+                            song_lyrics = s.getLyrics();
+                            SharedPreferences sharedPrefSongInfo = getSharedPreferences("songInfo", Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editorSongInfo = sharedPrefSongInfo.edit();
+                            editorSongInfo.putString("songLyrics", song_lyrics);
+                            editorSongInfo.commit();
+
+                            Toast.makeText(getBaseContext(), song_lyrics, Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(SongInfoActivity.this, LyricsActivity.class);
+                            startActivity(intent);
+
+                        }
 
                     }
 
+                    Log.e("Song List Response:", songListResponse.getMessage().getMessage());
                 }
 
-                Log.e("Song List Response:", songListResponse.getMessage().getMessage());
-            }
+
+                @Override
+                public void onFailure(Call<SongListResponse> call, Throwable t) {
 
 
-            @Override
-            public void onFailure(Call<SongListResponse> call, Throwable t) {
+                    Log.e("Failed", String.valueOf(t.getMessage()));
 
-
-                Log.e("Failed", String.valueOf(t.getMessage()));
-
-            }
-        });
-
+                }
+            });
+        }
 
     }
 
-    public void backToPlaylist(){
+    public void backToPlaylist() {
         SharedPreferences sharedPrefActivityInfo = getSharedPreferences("activityInfo", Context.MODE_PRIVATE);
         String activityState = sharedPrefActivityInfo.getString("activityState", "");
 
-        if(activityState.equals("SearchActivity")){
+        if (activityState.equals("SearchActivity")) {
             Intent intent = new Intent(SongInfoActivity.this, SearchActivity.class);
+            startActivity(intent);
+        } else {
+            Intent intent = new Intent(SongInfoActivity.this, PlayListActivity.class);
             startActivity(intent);
         }
 
