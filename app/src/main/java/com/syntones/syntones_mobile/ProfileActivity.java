@@ -143,11 +143,14 @@ public class ProfileActivity extends AppCompatActivity {
                 PlaylistResponse playlistResponse = response.body();
                 List<Playlist> playlists = playlistResponse.getPlaylists();
 
-                for (int a = 0; a < 4; a++) {
+                if(playlists!=null){
+                    for (int a = 0; a < 4; a++) {
 
-                    arrayAdapter.add(playlists.get(a).getPlaylistName());
-                    arrayAdapter.notifyDataSetChanged();
+                        arrayAdapter.add(playlists.get(a).getPlaylistName());
+                        arrayAdapter.notifyDataSetChanged();
+                    }
                 }
+
 
                 Log.e("Playlist Response: ", playlistResponse.getMessage().getMessage());
             }
@@ -164,8 +167,14 @@ public class ProfileActivity extends AppCompatActivity {
         SharedPreferences sharedPrefUserInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         SharedPreferences.Editor editorUserInfo = sharedPrefUserInfo.edit();
 
+        SharedPreferences sharedPrefUserSession = getSharedPreferences("userSession", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editorUserSession = sharedPrefUserSession.edit();
+
+        editorUserSession.clear();
+        editorUserSession.commit();
         editorUserInfo.clear();
         editorUserInfo.commit();
+
 
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);

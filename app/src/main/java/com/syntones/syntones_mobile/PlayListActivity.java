@@ -40,7 +40,7 @@ public class PlayListActivity extends AppCompatActivity {
     ArrayAdapter<String> arrayAdapter;
     EditText PlayListNameEt;
     ListView PlaylistsLv;
-    Button RemoveBtn;
+    Button RemoveBtn, EditBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,16 +51,17 @@ public class PlayListActivity extends AppCompatActivity {
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_single_choice, play_lists);
         PlaylistsLv.setAdapter(arrayAdapter);
         RemoveBtn = (Button) findViewById(R.id.btnRemove);
+        EditBtn = (Button) findViewById(R.id.btnEdit);
 
         this.displayPlaylist();
 
 
         SharedPreferences sharedPrefButtonInfo = getSharedPreferences("buttonInfo", Context.MODE_PRIVATE);
         String buttonStatus = sharedPrefButtonInfo.getString("buttonStatus", "");
+        Bundle extras = getIntent().getExtras();
 
-        if (buttonStatus.equals("addToPlaylist")) {
+        if (buttonStatus.equals("addToPlaylist") && extras != null) {
 
-            Bundle extras = getIntent().getExtras();
             final long songId = Long.parseLong(extras.get("SongId").toString());
 
             PlaylistsLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -203,12 +204,13 @@ public class PlayListActivity extends AppCompatActivity {
                 PlaylistResponse playlistResponse = response.body();
                 List<Playlist> playlists = playlistResponse.getPlaylists();
 
-                for (Playlist a : playlists) {
+                if (playlists != null) {
+                    for (Playlist a : playlists) {
 
-                    arrayAdapter.add(a.getPlaylistName());
-                    arrayAdapter.notifyDataSetChanged();
+                        arrayAdapter.add(a.getPlaylistName());
+                        arrayAdapter.notifyDataSetChanged();
+                    }
                 }
-
                 Log.e("Playlist Response: ", playlistResponse.getMessage().getMessage());
             }
 

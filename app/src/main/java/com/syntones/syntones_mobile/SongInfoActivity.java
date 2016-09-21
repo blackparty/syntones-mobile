@@ -23,7 +23,9 @@ import com.syntones.response.PlaylistSongsResponse;
 import com.syntones.response.SongListResponse;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -203,9 +205,15 @@ public class SongInfoActivity extends AppCompatActivity {
 
     public void playBtn(String[] songs_urls, String[] songs_titles, String[] songs_artists, int size) {
 
+        SharedPreferences sharedPrefUserSession = getSharedPreferences("userSession", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editorUserSession = sharedPrefUserSession.edit();
+        long count = sharedPrefUserSession.getLong("sessionUser", 0);
+        String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+
         SongTitleTv.setText(songs_titles[counter]);
         ArtistNameTv.setText(songs_artists[counter]);
 
+        Toast.makeText(getBaseContext(), String.valueOf(count) + " - " + String.valueOf(currentDateTimeString), Toast.LENGTH_SHORT).show();
 
 //            mediaPlayer.setDataSource(songs_urls[counter]);
 //

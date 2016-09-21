@@ -67,6 +67,20 @@ public class LoginActivity extends AppCompatActivity {
                 SharedPreferences sharedPrefUserInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editorUserInfo = sharedPrefUserInfo.edit();
 
+                SharedPreferences sharedPrefUserSession = getSharedPreferences("userSession", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editorUserSession = sharedPrefUserSession.edit();
+
+                long count = 1;
+                editorUserSession.putLong("sessionUser", count);
+
+                long sessionCount = sharedPrefUserSession.getLong("sessionUser", count);
+                ++sessionCount;
+
+                editorUserSession.putLong("sessionUser", sessionCount);
+                editorUserSession.commit();
+                count = sharedPrefUserSession.getLong("sessionUser", count);
+                Log.d("SESSION TEST", String.valueOf(count));
+
                 LoginResponse loginResponse = response.body();
 
                 editorUserInfo.putString("username", username);
