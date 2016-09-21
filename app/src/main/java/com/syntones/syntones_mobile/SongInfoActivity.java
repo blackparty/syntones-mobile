@@ -213,7 +213,9 @@ public class SongInfoActivity extends AppCompatActivity {
         SongTitleTv.setText(songs_titles[counter]);
         ArtistNameTv.setText(songs_artists[counter]);
 
-        Toast.makeText(getBaseContext(), String.valueOf(count) + " - " + String.valueOf(currentDateTimeString), Toast.LENGTH_SHORT).show();
+
+        Log.d("Played Song", String.valueOf(count) + " - " + String.valueOf(songs_urls[counter]) + " - " + currentDateTimeString);
+
 
 //            mediaPlayer.setDataSource(songs_urls[counter]);
 //
@@ -229,6 +231,7 @@ public class SongInfoActivity extends AppCompatActivity {
     public void pauseBtn(String[] songs_urls, String[] songs_titles, String[] songs_artists, int size) throws IOException {
         SongTitleTv.setText(songs_titles[counter]);
         ArtistNameTv.setText(songs_artists[counter]);
+
 
 //        length = mediaPlayer.getCurrentPosition();
 //        mediaPlayer.pause();

@@ -66,7 +66,7 @@ public class ViewPlayListActivity extends AppCompatActivity {
 
         this.displaySongList();
 
-        if (EditSongBtn.getText().equals("EDIT")) {
+        if (EditSongBtn.getText().equals("Edit")) {
 
 
             ViewPlaylistLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -111,7 +111,7 @@ public class ViewPlayListActivity extends AppCompatActivity {
             }
         });
 
-        if (EditSongBtn.getText().equals("DONE")) {
+        if (EditSongBtn.getText().equals("Done")) {
 
             ViewPlaylistLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
