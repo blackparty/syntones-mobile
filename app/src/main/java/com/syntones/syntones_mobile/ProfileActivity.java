@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.syntones.model.Playlist;
 import com.syntones.model.User;
 import com.syntones.remote.SyntonesWebAPI;
+import com.syntones.response.LogoutResponse;
 import com.syntones.response.PlaylistResponse;
 
 import java.util.ArrayList;
@@ -143,8 +144,8 @@ public class ProfileActivity extends AppCompatActivity {
                 PlaylistResponse playlistResponse = response.body();
                 List<Playlist> playlists = playlistResponse.getPlaylists();
 
-                if(playlists!=null){
-                    for (int a = 0; a < 4; a++) {
+                if (playlists != null) {
+                    for (int a = 0; a < playlists.size(); a++) {
 
                         arrayAdapter.add(playlists.get(a).getPlaylistName());
                         arrayAdapter.notifyDataSetChanged();
@@ -167,14 +168,25 @@ public class ProfileActivity extends AppCompatActivity {
         SharedPreferences sharedPrefUserInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         SharedPreferences.Editor editorUserInfo = sharedPrefUserInfo.edit();
 
-        SharedPreferences sharedPrefUserSession = getSharedPreferences("userSession", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editorUserSession = sharedPrefUserSession.edit();
 
-        editorUserSession.clear();
-        editorUserSession.commit();
         editorUserInfo.clear();
         editorUserInfo.commit();
 
+        SyntonesWebAPI syntonesWebAPI = SyntonesWebAPI.Factory.getInstance(sContext);
+
+        syntonesWebAPI.logout();
+
+        SyntonesWebAPI.Factory.getInstance(sContext).logout().enqueue(new Callback<LogoutResponse>() {
+            @Override
+            public void onResponse(Call<LogoutResponse> call, Response<LogoutResponse> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<LogoutResponse> call, Throwable t) {
+
+            }
+        });
 
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);

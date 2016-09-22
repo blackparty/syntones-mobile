@@ -124,7 +124,7 @@
 
         <ListView
             android:layout_width="wrap_content"
-            android:layout_height="150dp"
+            android:layout_height="176dp"
             android:id="@+id/lvBasketRecom"
             android:layout_gravity="center_horizontal|bottom"
             android:background="#FFFFFF"

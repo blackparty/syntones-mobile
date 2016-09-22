@@ -8,15 +8,18 @@ import android.content.Context;
 
 import com.syntones.model.Playlist;
 import com.syntones.model.PlaylistSong;
-import com.syntones.model.Song;
 import com.syntones.model.User;
 import com.syntones.response.LibraryResponse;
+import com.syntones.response.ListenResponse;
 import com.syntones.response.LoginResponse;
+import com.syntones.response.LogoutResponse;
 import com.syntones.response.PlaylistResponse;
 import com.syntones.response.PlaylistSongsResponse;
 import com.syntones.response.RemovePlaylistResponse;
-import com.syntones.response.RemoveToPlaylistResponse;
 import com.syntones.response.SongListResponse;
+import com.syntones.model.TemporaryDB;
+import com.syntones.response.ThreeItemSetResponse;
+import com.syntones.response.TwoItemSetResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -25,12 +28,8 @@ import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
-import retrofit2.http.Field;
-import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
-import retrofit2.http.Path;
-import retrofit2.http.Query;
 
 public interface SyntonesWebAPI {
 
@@ -63,6 +62,20 @@ public interface SyntonesWebAPI {
     @POST("removeToPlaylist")
     Call<RemovePlaylistResponse> removeSongFromPlaylist(@Body PlaylistSong playlistSong);
 
+    @POST("listen")
+    Call<ListenResponse> listen(@Body List<TemporaryDB> temporaryDB);
+
+    @POST("listenPlaylist")
+    Call<ListenResponse> listenPlaylist(@Body Playlist playlist);
+
+    @POST("getTwoItemSet")
+    Call<TwoItemSetResponse> getTwoItemSet();
+
+    @POST("getThreeItemSet")
+    Call<ThreeItemSetResponse> getThreeItemSet();
+
+    @POST("logoutProcess")
+    Call<LogoutResponse> logout();
 
     class Factory {
 
