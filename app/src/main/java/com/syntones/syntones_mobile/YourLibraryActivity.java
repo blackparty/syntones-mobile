@@ -36,20 +36,9 @@ public class YourLibraryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_your_library);
 
         RecentlyPlayedLv = (ListView) findViewById(R.id.lvRecentlyPlayed);
-        Product[] items = {
-                new Product(1, "Milk", 21.50),
-                new Product(2, "Butter", 15.99),
-                new Product(3, "Yogurt", 14.90),
-                new Product(4, "Toothpaste", 7.99),
-                new Product(5, "Ice Cream", 10.00),
-                new Product(6, "Chicken", 21.50),
-                new Product(7, "Pork", 15.99),
-                new Product(8, "Eggs", 14.90),
-                new Product(9, "Cheese", 7.99),
-                new Product(10, "Strawberry", 10.00),
-        };
-        ArrayAdapter<Product> arrayAdapter = new ArrayAdapter<Product>(this, android.R.layout.simple_list_item_1, items);
-        RecentlyPlayedLv.setAdapter(arrayAdapter);
+
+//        ArrayAdapter<Product> arrayAdapter = new ArrayAdapter<Product>(this, android.R.layout.simple_list_item_1, items);
+//        RecentlyPlayedLv.setAdapter(arrayAdapter);
         RecentlyPlayedLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

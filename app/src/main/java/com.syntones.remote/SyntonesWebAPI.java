@@ -9,6 +9,8 @@ import android.content.Context;
 import com.syntones.model.Playlist;
 import com.syntones.model.PlaylistSong;
 import com.syntones.model.User;
+import com.syntones.response.ArtistResponse;
+import com.syntones.response.GeneratePlaylistResponse;
 import com.syntones.response.LibraryResponse;
 import com.syntones.response.ListenResponse;
 import com.syntones.response.LoginResponse;
@@ -18,6 +20,7 @@ import com.syntones.response.PlaylistSongsResponse;
 import com.syntones.response.RemovePlaylistResponse;
 import com.syntones.response.SongListResponse;
 import com.syntones.model.TemporaryDB;
+import com.syntones.response.TagsResponse;
 import com.syntones.response.ThreeItemSetResponse;
 import com.syntones.response.TwoItemSetResponse;
 
@@ -76,6 +79,21 @@ public interface SyntonesWebAPI {
 
     @POST("logoutProcess")
     Call<LogoutResponse> logout();
+
+    @POST("getAllArtists")
+    Call<ArtistResponse> getAllArtists();
+
+    @GET("getAllTags")
+    Call<TagsResponse> getAllTags();
+
+    @POST("generatePlaylistByArtist")
+    Call<GeneratePlaylistResponse> generatePlaylistByArtist(@Body String artistName);
+
+    @POST("generatePlaylistByTags")
+    Call<GeneratePlaylistResponse> generatePlaylistByTags(@Body String tag);
+
+    @POST("saveGeneratedPlaylist")
+    Call<GeneratePlaylistResponse> saveGeneratedPlaylist(@Body Playlist playlist);
 
     class Factory {
 

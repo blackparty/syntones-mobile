@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2E2E2E"
+    android:background="#FFFFFF"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
@@ -43,32 +43,15 @@
                 android:textSize="28sp"
                 android:textStyle="bold"
                 android:layout_gravity="center_horizontal"
-                android:textColor="#FFFFFF"
+                android:textColor="#000000"
                 android:id="@+id/tvProfUsername" />
 
-            <ListView
+            <Button
+                android:text="Make Me a Playlist"
                 android:layout_width="match_parent"
-                android:layout_height="130dp"
-                android:id="@+id/lvProfPlaylists"
-                android:layout_marginBottom="27dp"
-                android:layout_alignBottom="@+id/bottom_container"
-                android:layout_centerHorizontal="true"
-                android:background="#FFFFFF"
-                android:layout_marginTop="50dp"
-                android:layout_weight="0.71"
-                android:choiceMode="singleChoice" />
-
-            <TextView
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="See All Playlists >"
-                android:id="@+id/tvViewAllPlaylists"
-                android:textColor="#FFFFFF"
-                android:textSize="18dp"
-                android:layout_below="@+id/tvViewPlaylists"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:onClick="viewAllPlaylists" />
+                android:id="@+id/btnMakeMeAPlaylist"
+                android:onClick="makeMeAPlaylistBtn" />
 
         </LinearLayout>
     </ScrollView>

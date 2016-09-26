@@ -8,7 +8,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.syntones.syntones_mobile.SongInfoActivity"
-    android:background="#2E2E2E">
+    android:background="#FFFFFF">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -29,7 +29,7 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="Artist Name"
                 android:id="@+id/tvArtistName"
-                android:textColor="#FFFFFF"
+                android:textColor="#000000"
                 android:textSize="15dp"
                 android:layout_below="@+id/tvSongTitle"
                 android:layout_centerHorizontal="true"
@@ -42,7 +42,7 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="Song Title"
                 android:id="@+id/tvSongTitle"
-                android:textColor="#FFFFFF"
+                android:textColor="#000000"
                 android:textSize="30dp"
                 android:textStyle="bold"
                 android:layout_below="@+id/switchSaveOffline"
@@ -59,7 +59,7 @@
                 android:layout_alignLeft="@+id/ivNextBtn"
                 android:layout_alignStart="@+id/ivNextBtn"
                 android:checked="false"
-                android:textColor="#FFFFFF"
+                android:textColor="#000000"
                 android:layout_gravity="right|top"
                 android:layout_marginRight="5dp"
                 android:layout_marginTop="5dp" />
@@ -138,7 +138,7 @@
             android:id="@+id/textView10"
             android:layout_gravity="left|center_vertical"
             android:layout_marginTop="80dp"
-            android:textColor="#FFFFFF" />
+            android:textColor="#000000" />
 
         <ImageView
             android:layout_width="115dp"
@@ -147,12 +147,13 @@
             android:src="@drawable/ic_pause_circle_outline_black_24dp"
             android:visibility="invisible"
             android:onClick="pauseBtn"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="16dp"
             android:layout_below="@+id/ivPlayBtn"
             android:layout_alignLeft="@+id/ivPlayBtn"
             android:layout_alignStart="@+id/ivPlayBtn"
             android:layout_gravity="center"
-            android:layout_marginBottom="80dp" />
+            android:layout_marginBottom="80dp"
+            android:layout_marginRight="7dp" />
 
         <Button
             style="?android:attr/buttonStyleSmall"
@@ -170,7 +171,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/tvBackToSongList"
-            android:textColor="#FFFFFF"
+            android:textColor="#000000"
             android:layout_alignParentBottom="false"
             android:layout_alignParentLeft="false"
             android:layout_alignParentStart="false"

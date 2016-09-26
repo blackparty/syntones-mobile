@@ -90,6 +90,7 @@ public class SearchActivity extends AppCompatActivity {
 
                 SongListResponse songListResponse = response.body();
                 List<Song> songList = songListResponse.getSongs();
+
                 for (Song s : songList) {
                     arrayAdapater.add(s.getSongTitle() + "\nby " + s.getArtist().getArtistName());
                     arrayAdapater.notifyDataSetChanged();

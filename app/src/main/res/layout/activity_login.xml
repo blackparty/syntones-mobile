@@ -72,4 +72,16 @@
         android:layout_marginTop="25dp"
         android:textColor="#FFFFFF" />
 
+    <TextView
+        android:text="Account info is incorrect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="124dp"
+        android:id="@+id/tvLoginMessage"
+        android:textColor="#FF4A53"
+        android:layout_below="@+id/textView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:visibility="invisible" />
+
 </RelativeLayout>

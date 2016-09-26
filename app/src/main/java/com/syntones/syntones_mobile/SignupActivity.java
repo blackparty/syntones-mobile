@@ -38,12 +38,9 @@ import retrofit2.http.Field;
 public class SignupActivity extends AppCompatActivity {
 
     private SignupActivity sContext;
-
-    EditText EmailEt, UsernameEt, PasswordEt, DateOfBirthEt;
-
-    RadioGroup GenderRg;
-
-    TextView UsernameTv;
+    private EditText EmailEt, UsernameEt, PasswordEt, DateOfBirthEt;
+    private RadioGroup GenderRg;
+    private TextView UsernameTv;
 
     @BindView(R.id.btnSignUp)
     Button btn_signUp;
@@ -65,7 +62,8 @@ public class SignupActivity extends AppCompatActivity {
     }
 
 
-    @OnClick(R.id.btnSignUp) public void signUp(View view) {
+    @OnClick(R.id.btnSignUp)
+    public void signUp(View view) {
 
         String email = EmailEt.getText().toString().trim();
         String username = UsernameEt.getText().toString().trim();
@@ -77,10 +75,10 @@ public class SignupActivity extends AppCompatActivity {
         int index = GenderRg.indexOfChild(rBtnGender);
         String gender;
 
-        if(index==0){
+        if (index == 0) {
 
             gender = "Male";
-        }else{
+        } else {
 
             gender = "Female";
         }

@@ -38,11 +38,10 @@ import retrofit2.Response;
 
 public class ViewPlayListActivity extends AppCompatActivity {
 
-    TextView PlaylistNameTv;
-    ListView ViewPlaylistLv;
-    Button EditSongBtn, RemoveSongBtn;
+    private TextView PlaylistNameTv;
+    private ListView ViewPlaylistLv;
+    private Button EditSongBtn, RemoveSongBtn;
     private ViewPlayListActivity sContext;
-
     private ArrayAdapter<String> arrayAdapter;
     private ArrayList<String> songs = new ArrayList<>();
 
@@ -64,39 +63,8 @@ public class ViewPlayListActivity extends AppCompatActivity {
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_single_choice, songs);
         ViewPlaylistLv.setAdapter(arrayAdapter);
 
-        this.displaySongList();
-
-        if (EditSongBtn.getText().equals("Edit")) {
-
-
-            ViewPlaylistLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    String song = String.valueOf(parent.getItemAtPosition(position));
-
-                    SharedPreferences sharedPrefSongInfo = getSharedPreferences("songInfo", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editorSongInfo = sharedPrefSongInfo.edit();
-
-                    String[] song_info = song.split("\\s(by)\\s");
-
-                    editorSongInfo.putString("songTitle", song_info[0]);
-                    editorSongInfo.putString("artistName", song_info[1]);
-
-                    editorSongInfo.commit();
-
-                    SharedPreferences sharedPrefActivityInfo = getSharedPreferences("activityInfo", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editorActivityInfo = sharedPrefActivityInfo.edit();
-                    editorActivityInfo.putString("activityState", "Playlist");
-                    editorActivityInfo.commit();
-
-                    Intent intent = new Intent(ViewPlayListActivity.this, SongInfoActivity.class);
-                    startActivity(intent);
-                    Toast.makeText(getBaseContext(), song, Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-
-
+        insertSongList();
+        displayViewSongList();
         EditSongBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -111,32 +79,59 @@ public class ViewPlayListActivity extends AppCompatActivity {
             }
         });
 
-        if (EditSongBtn.getText().equals("Done")) {
-
-            ViewPlaylistLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    songs.get(position);
-
-
-                }
-            });
-        }
     }
 
 
     public void editSong(View view) {
 
         if (EditSongBtn.getText().equals("Edit")) {
+            displaySongList();
             EditSongBtn.setText("Done");
             RemoveSongBtn.setVisibility(view.VISIBLE);
         } else if (EditSongBtn.getText().equals("Done")) {
+            displayViewSongList();
             EditSongBtn.setText("Edit");
             RemoveSongBtn.setVisibility(view.INVISIBLE);
         }
 
     }
 
+    public void displayViewSongList(){
+        ViewPlaylistLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String song = String.valueOf(parent.getItemAtPosition(position));
+
+                SharedPreferences sharedPrefSongInfo = getSharedPreferences("songInfo", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editorSongInfo = sharedPrefSongInfo.edit();
+
+                String[] song_info = song.split("\\s(by)\\s");
+
+                editorSongInfo.putString("songTitle", song_info[0]);
+                editorSongInfo.putString("artistName", song_info[1]);
+
+                editorSongInfo.commit();
+
+                SharedPreferences sharedPrefActivityInfo = getSharedPreferences("activityInfo", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editorActivityInfo = sharedPrefActivityInfo.edit();
+                editorActivityInfo.putString("activityState", "Playlist");
+                editorActivityInfo.commit();
+
+                Intent intent = new Intent(ViewPlayListActivity.this, SongInfoActivity.class);
+                startActivity(intent);
+                Toast.makeText(getBaseContext(), song, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void displaySongList(){
+        ViewPlaylistLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            }
+        });
+    }
     public void removeSong(View view) {
         SharedPreferences sharedPrefUserInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         SharedPreferences sharedPrefPlaylistInfo = getSharedPreferences("playlistInfo", Context.MODE_PRIVATE);
@@ -200,7 +195,7 @@ public class ViewPlayListActivity extends AppCompatActivity {
         }
     }
 
-    public void displaySongList() {
+    public void insertSongList() {
 
         final SyntonesWebAPI syntonesWebAPI = SyntonesWebAPI.Factory.getInstance(sContext);
         SharedPreferences sharedPrefUserInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE);

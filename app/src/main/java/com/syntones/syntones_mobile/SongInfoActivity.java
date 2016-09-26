@@ -206,13 +206,9 @@ public class SongInfoActivity extends AppCompatActivity {
 
                     if (a.getSongTitle().equals(SongTitleTv.getText().toString()) && a.getArtist().getArtistName().equals(ArtistNameTv.getText().toString())) {
 
-                        SharedPreferences sharedPrefButtonInfo = getSharedPreferences("buttonInfo", Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editorButtonInfo = sharedPrefButtonInfo.edit();
-                        editorButtonInfo.putString("buttonStatus", "addToPlaylist");
-                        editorButtonInfo.commit();
-
                         Intent intent = new Intent(SongInfoActivity.this, PlayListActivity.class);
                         intent.putExtra("SongId", a.getSongId());
+                        intent.putExtra("buttonStatus", "addToPlaylist");
                         startActivity(intent);
 
                         Log.e("Song List Response ", songListResponse.getMessage().getMessage());
@@ -292,14 +288,14 @@ public class SongInfoActivity extends AppCompatActivity {
 
                                             if (b.getSongId() == Long.parseLong(a.getRecom_song())) {
 
-                                                if (b.getSongTitle() != null && b.getArtist().getArtistName() != null) {
 
-                                                    arrayAdapter.add(b.getSongTitle() + " by " + b.getArtist().getArtistName());
+                                                arrayAdapter.add(b.getSongTitle() + " by " + b.getArtist().getArtistName());
 //                                                    arrayAdapter.notifyDataSetChanged();
-                                                }
 
-                                                Log.d("TWO ITEM SET RECOM", a.getRecom_song() + " - " + b.getSongTitle() + " - " + b.getArtist().getArtistName() + " - " + song1);
+
+                                                Log.d("TWO ITEM SET RECOM", a.getRecom_song() + " - " + b.getSongTitle() + " - " + b.getArtist().getArtistName() + " - " + song1 + " CONFIDENCE: " + String.valueOf(a.getConfidence()));
                                             }
+
                                         }
                                     }
 
@@ -351,7 +347,7 @@ public class SongInfoActivity extends AppCompatActivity {
 
                                                 }
 
-                                                Log.d("THREE ITEM SET RECOM", b.getRecom_song() + " - " + c.getSongTitle() + " - " + song1 + " | " + song2);
+                                                Log.d("THREE ITEM SET RECOM", b.getRecom_song() + " - " + c.getSongTitle() + " - " + song1 + " | " + song2 + " CONFIDENCE: " + String.valueOf(b.getConfidence()));
                                             }
                                         }
                                     }
@@ -464,7 +460,8 @@ public class SongInfoActivity extends AppCompatActivity {
 
             SongTitleTv.setText(songs_titles[position]);
             ArtistNameTv.setText(songs_artists[position]);
-
+            PlayBtnIv.setVisibility(View.VISIBLE);
+            PauseBtnIv.setVisibility(View.INVISIBLE);
 //            mediaPlayer.setDataSource(songs_urls[counter]);
 //            mediaPlayer.prepare();
 //            mediaPlayer.start();
@@ -484,6 +481,8 @@ public class SongInfoActivity extends AppCompatActivity {
 
             SongTitleTv.setText(songs_titles[position]);
             ArtistNameTv.setText(songs_artists[position]);
+            PlayBtnIv.setVisibility(View.VISIBLE);
+            PauseBtnIv.setVisibility(View.INVISIBLE);
 
 //            mediaPlayer.setDataSource(songs_urls[counter]);
 //            mediaPlayer.prepare();

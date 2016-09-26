@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.syntones.model.Playlist;
@@ -30,11 +31,11 @@ import retrofit2.Response;
 public class LoginActivity extends AppCompatActivity {
 
     private LoginActivity lContext;
-    EditText UsernameEt, PasswordEt;
+    private EditText UsernameEt, PasswordEt;
     @BindView(R.id.btnLogIn)
-    Button login;
-    Button btn_signUp;
-
+    private Button login;
+    private Button btn_signUp;
+    private TextView LoginMessageTv;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +43,7 @@ public class LoginActivity extends AppCompatActivity {
 
         UsernameEt = (EditText) findViewById(R.id.etUsername);
         PasswordEt = (EditText) findViewById(R.id.etPassword);
+        LoginMessageTv = (TextView) findViewById(R.id.tvLoginMessage);
     }
 
     @OnClick(R.id.btnLogIn)
@@ -69,12 +71,18 @@ public class LoginActivity extends AppCompatActivity {
                 SharedPreferences sharedPrefUserInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editorUserInfo = sharedPrefUserInfo.edit();
 
+                if(loginResponse.getMessage().getFlag()==true){
+                    editorUserInfo.putString("username", username);
+                    editorUserInfo.commit();
 
-                editorUserInfo.putString("username", username);
-                editorUserInfo.commit();
+                    LoginMessageTv.setVisibility(View.INVISIBLE);
 
-                Intent intent = new Intent(LoginActivity.this, YourLibraryActivity.class);
-                startActivity(intent);
+                    Intent intent = new Intent(LoginActivity.this, YourLibraryActivity.class);
+                    startActivity(intent);
+                }else{
+                    LoginMessageTv.setVisibility(View.VISIBLE);
+                }
+
 
 //                Log.e("Login Response: ", loginResponse.getMessage().getMessage());
 

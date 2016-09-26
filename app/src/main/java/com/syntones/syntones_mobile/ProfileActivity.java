@@ -30,11 +30,10 @@ import retrofit2.Response;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    TextView ProfUsernameTv;
-    ListView ProfPlaylistLv;
-    ArrayList<String> play_lists = new ArrayList<>();
+    private TextView ProfUsernameTv;
+    private Button MakeMeAPlaylistBtn;
     private ProfileActivity sContext;
-    ArrayAdapter<String> arrayAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,70 +41,27 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
 
         ProfUsernameTv = (TextView) findViewById(R.id.tvProfUsername);
-        ProfPlaylistLv = (ListView) findViewById(R.id.lvProfPlaylists);
-
+        MakeMeAPlaylistBtn = (Button) findViewById(R.id.btnMakeMeAPlaylist);
         SharedPreferences sharedPrefUserInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
 
         String username = sharedPrefUserInfo.getString("username", "");
 
-        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_single_choice, play_lists);
-        ProfPlaylistLv.setAdapter(arrayAdapter);
         ProfUsernameTv.setText(username);
-        displayPlaylist(username);
 
-
-        ProfPlaylistLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        MakeMeAPlaylistBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                play_lists.get(position);
-
-                final SyntonesWebAPI syntonesWebAPI = SyntonesWebAPI.Factory.getInstance(sContext);
-                SharedPreferences sharedPrefUserInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-                final String playlist_name = String.valueOf(ProfPlaylistLv.getItemAtPosition(position));
-                String username = sharedPrefUserInfo.getString("username", "");
-                final User user = new User();
-                user.setUsername(username);
-                syntonesWebAPI.getPlaylistFromDB(user).enqueue(new Callback<PlaylistResponse>() {
-                    @Override
-                    public void onResponse(Call<PlaylistResponse> call, Response<PlaylistResponse> response) {
-
-
-                        PlaylistResponse playlistResponse = response.body();
-                        List<Playlist> playlists = playlistResponse.getPlaylists();
-
-                        for (int a = 0; a < 4; a++) {
-
-                            if (playlists.get(a).getPlaylistName().equals(playlist_name)) {
-                                Intent intent = new Intent(ProfileActivity.this, ViewPlayListActivity.class);
-                                SharedPreferences sharedPrefPlaylistInfo = getSharedPreferences("playlistInfo", Context.MODE_PRIVATE);
-                                SharedPreferences.Editor editorPlaylistInfo = sharedPrefPlaylistInfo.edit();
-                                editorPlaylistInfo.putString("playlistName", playlist_name);
-                                editorPlaylistInfo.putString("playlistId", String.valueOf(playlists.get(a).getPlaylistId()));
-                                editorPlaylistInfo.commit();
-                                startActivity(intent);
-                            }
-                        }
-
-
-                        Log.e("Playlist Response: ", playlistResponse.getMessage().getMessage());
-                    }
-
-                    @Override
-                    public void onFailure(Call<PlaylistResponse> call, Throwable t) {
-
-                    }
-                });
-
-
+            public void onClick(View v) {
+                makeMeAPlaylistBtn();
             }
         });
+
     }
 
+    public void makeMeAPlaylistBtn() {
 
-    public void viewAllPlaylists(View view) {
-
-        Intent intent = new Intent(this, PlayListActivity.class);
+        Intent intent = new Intent(this, GeneratePlaylistMenuActivity.class);
         startActivity(intent);
+
     }
 
     public void bottomBar(View view) {
@@ -130,39 +86,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     }
 
-    public void displayPlaylist(String username) {
-
-        final SyntonesWebAPI syntonesWebAPI = SyntonesWebAPI.Factory.getInstance(sContext);
-
-        User user = new User();
-        user.setUsername(username);
-        syntonesWebAPI.getPlaylistFromDB(user).enqueue(new Callback<PlaylistResponse>() {
-            @Override
-            public void onResponse(Call<PlaylistResponse> call, Response<PlaylistResponse> response) {
-
-
-                PlaylistResponse playlistResponse = response.body();
-                List<Playlist> playlists = playlistResponse.getPlaylists();
-
-                if (playlists != null) {
-                    for (int a = 0; a < playlists.size(); a++) {
-
-                        arrayAdapter.add(playlists.get(a).getPlaylistName());
-                        arrayAdapter.notifyDataSetChanged();
-                    }
-                }
-
-
-                Log.e("Playlist Response: ", playlistResponse.getMessage().getMessage());
-            }
-
-            @Override
-            public void onFailure(Call<PlaylistResponse> call, Throwable t) {
-
-            }
-        });
-
-    }
 
     public void logOut(View view) {
         SharedPreferences sharedPrefUserInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
