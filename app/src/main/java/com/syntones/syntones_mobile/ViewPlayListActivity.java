@@ -96,7 +96,7 @@ public class ViewPlayListActivity extends AppCompatActivity {
 
     }
 
-    public void displayViewSongList(){
+    public void displayViewSongList() {
         ViewPlaylistLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -117,14 +117,14 @@ public class ViewPlayListActivity extends AppCompatActivity {
                 editorActivityInfo.putString("activityState", "Playlist");
                 editorActivityInfo.commit();
 
-                Intent intent = new Intent(ViewPlayListActivity.this, SongInfoActivity.class);
+                Intent intent = new Intent(ViewPlayListActivity.this, PlayerActivity.class);
                 startActivity(intent);
                 Toast.makeText(getBaseContext(), song, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    public void displaySongList(){
+    public void displaySongList() {
         ViewPlaylistLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -132,6 +132,7 @@ public class ViewPlayListActivity extends AppCompatActivity {
             }
         });
     }
+
     public void removeSong(View view) {
         SharedPreferences sharedPrefUserInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         SharedPreferences sharedPrefPlaylistInfo = getSharedPreferences("playlistInfo", Context.MODE_PRIVATE);
@@ -209,6 +210,11 @@ public class ViewPlayListActivity extends AppCompatActivity {
         data.put("id", playlist_id);
         data.put("username", username);
 
+        final SharedPreferences sharedPrefPlayedSongInfo = getSharedPreferences("playedSongInfo", 0);
+        final SharedPreferences.Editor editorPlayedSongInfo = sharedPrefPlayedSongInfo.edit();
+        editorPlayedSongInfo.clear();
+        editorPlayedSongInfo.apply();
+
         syntonesWebAPI.getSongsPlaylist(data).enqueue(new Callback<PlaylistSongsResponse>() {
             @Override
             public void onResponse(Call<PlaylistSongsResponse> call, Response<PlaylistSongsResponse> response) {
@@ -223,12 +229,10 @@ public class ViewPlayListActivity extends AppCompatActivity {
 
                         SongListResponse songListResponse = response.body();
 
-                        SharedPreferences sharedPrefPlayedSongInfo = getSharedPreferences("playedSongInfo", 0);
-                        SharedPreferences.Editor editorPlayedSongInfo = sharedPrefPlayedSongInfo.edit();
-
 
                         playlist.setPlaylistId(Long.parseLong(playlist_id));
                         playlist.setSongs(playlistSongsResponse.getPlaylist().getSongs());
+                        String[] song_ids = new String[playlist.getSongs().size()];
                         String[] song_urls = new String[playlist.getSongs().size()];
                         String[] song_titles = new String[playlist.getSongs().size()];
                         String[] song_artists = new String[playlist.getSongs().size()];
@@ -237,11 +241,13 @@ public class ViewPlayListActivity extends AppCompatActivity {
 
                         int b = 0;
                         for (Song a : playlist.getSongs()) {
-                            song_urls[b] = String.valueOf(a.getSongId());
+                            song_ids[b] = String.valueOf(a.getSongId());
+                            song_urls[b] = String.valueOf(a.getFilePath());
                             song_titles[b] = a.getSongTitle();
                             song_artists[b] = a.getArtist().getArtistName();
                             song_lyrics[b] = a.getLyrics();
 
+                            editorPlayedSongInfo.putString("song_id_array" + "_" + b, song_ids[b]);
                             editorPlayedSongInfo.putString("song_url_array" + "_" + b, song_urls[b]);
                             editorPlayedSongInfo.putString("song_titles_array" + "_" + b, song_titles[b]);
                             editorPlayedSongInfo.putString("song_artists_array" + "_" + b, song_artists[b]);

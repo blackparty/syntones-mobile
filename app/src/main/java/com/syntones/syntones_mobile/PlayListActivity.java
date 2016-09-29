@@ -145,7 +145,7 @@ public class PlayListActivity extends AppCompatActivity {
                                     public void onResponse(Call<LibraryResponse> call, Response<LibraryResponse> response) {
                                         LibraryResponse libraryResponse = response.body();
 
-                                        Intent intent = new Intent(PlayListActivity.this, SongInfoActivity.class);
+                                        Intent intent = new Intent(PlayListActivity.this, PlayerActivity.class);
 
                                         startActivity(intent);
                                         Log.e("Library Response: ", libraryResponse.getMessage().getMessage());

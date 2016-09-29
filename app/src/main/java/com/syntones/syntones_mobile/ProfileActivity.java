@@ -93,7 +93,7 @@ public class ProfileActivity extends AppCompatActivity {
 
 
         editorUserInfo.clear();
-        editorUserInfo.commit();
+        editorUserInfo.apply();
 
         SyntonesWebAPI syntonesWebAPI = SyntonesWebAPI.Factory.getInstance(sContext);
 

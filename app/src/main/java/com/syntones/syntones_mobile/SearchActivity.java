@@ -53,28 +53,87 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
 
+        SharedPreferences sharedPrefPlayedSongInfo = getSharedPreferences("playedSongInfo", 0);
+        final SharedPreferences.Editor editorPlayedSongInfo = sharedPrefPlayedSongInfo.edit();
+
+        SharedPreferences sharedPrefSongInfo = getSharedPreferences("songInfo", Context.MODE_PRIVATE);
+        final SharedPreferences.Editor editorSongInfo = sharedPrefSongInfo.edit();
+
+        editorPlayedSongInfo.clear();
+        editorPlayedSongInfo.apply();
+        editorSongInfo.clear();
+        editorSongInfo.apply();
+
         SearchResultLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String song = String.valueOf(parent.getItemAtPosition(position));
+                final String song = String.valueOf(parent.getItemAtPosition(position));
 
-                SharedPreferences sharedPrefSongInfo = getSharedPreferences("songInfo", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editorSongInfo = sharedPrefSongInfo.edit();
 
-                String[] song_info = song.split("\\s(by)\\s");
+                SyntonesWebAPI syntonesWebAPI = SyntonesWebAPI.Factory.getInstance(sContext);
+                syntonesWebAPI.getAllSongsFromDB().enqueue(new Callback<SongListResponse>() {
+                    @Override
+                    public void onResponse(Call<SongListResponse> call, Response<SongListResponse> response) {
 
-                editorSongInfo.putString("songTitle", song_info[0]);
-                editorSongInfo.putString("artistName", song_info[1]);
+                        SongListResponse songListResponse = response.body();
+                        List<Song> songList = songListResponse.getSongs();
 
-                editorSongInfo.commit();
 
-                SharedPreferences sharedPrefActivityInfo = getSharedPreferences("activityInfo", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editorActivityInfo = sharedPrefActivityInfo.edit();
-                editorActivityInfo.putString("activityState", "SearchActivity");
-                editorActivityInfo.commit();
+                        String[] song_urls = new String[1];
+                        String[] song_titles = new String[1];
+                        String[] song_artists = new String[1];
+                        String[] song_lyrics = new String[1];
+                        String[] song_ids = new String[1];
+                        editorPlayedSongInfo.putInt("song_url_array" + "_size", song_urls.length);
 
-                Intent intent = new Intent(SearchActivity.this, SongInfoActivity.class);
-                startActivity(intent);
+                        String[] song_info = song.split("\\s(by)\\s");
+                        editorSongInfo.putString("songTitle", song_info[0]);
+                        editorSongInfo.putString("artistName", song_info[1]);
+
+                        Log.d("ARTIST NAME:", song_info[1]);
+                        editorSongInfo.apply();
+                        int b = 0;
+                        for (Song a : songList) {
+
+                            if (a.getSongTitle().equals(song_info[0]) && a.getArtist().getArtistName().equals(song_info[1])) {
+
+
+                                song_urls[b] = String.valueOf(a.getFilePath());
+                                song_ids[b] = String.valueOf(a.getSongId());
+                                song_titles[b] = a.getSongTitle();
+                                song_artists[b] = a.getArtist().getArtistName();
+                                song_lyrics[b] = a.getLyrics();
+
+
+                                editorPlayedSongInfo.putString("song_url_array" + "_" + b, song_urls[b]);
+                                editorPlayedSongInfo.putString("song_id_array" + "_" + b, song_ids[b]);
+                                editorPlayedSongInfo.putString("song_titles_array" + "_" + b, song_titles[b]);
+                                editorPlayedSongInfo.putString("song_artists_array" + "_" + b, song_artists[b]);
+                                editorPlayedSongInfo.putString("song_lyrics_array" + "_" + b, song_lyrics[b]);
+                                b++;
+
+
+                            }
+                        }
+
+                        editorPlayedSongInfo.apply();
+
+                        SharedPreferences sharedPrefActivityInfo = getSharedPreferences("activityInfo", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editorActivityInfo = sharedPrefActivityInfo.edit();
+                        editorActivityInfo.putString("activityState", "SearchActivity");
+                        editorActivityInfo.commit();
+
+                        Intent intent = new Intent(SearchActivity.this, PlayerActivity.class);
+                        startActivity(intent);
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<SongListResponse> call, Throwable t) {
+
+                    }
+                });
+
 
             }
         });

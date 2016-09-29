@@ -37,7 +37,7 @@ public class LyricsActivity extends AppCompatActivity {
     }
 
     public void hideLyrics() {
-        Intent intent = new Intent(this, SongInfoActivity.class);
+        Intent intent = new Intent(this, PlayerActivity.class);
         startActivity(intent);
 
     }

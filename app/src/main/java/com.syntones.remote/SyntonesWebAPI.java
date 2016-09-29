@@ -36,7 +36,7 @@ import retrofit2.http.POST;
 
 public interface SyntonesWebAPI {
 
-    String ENDPOINT = "http://10.0.2.2:8081/syntones-web/";
+    String ENDPOINT = "http://192.168.137.1:8081/syntones-web/";
 
     @POST("register")
     Call<User> createUser(@Body User user);
