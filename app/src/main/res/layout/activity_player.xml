@@ -177,7 +177,7 @@
     <Button
         android:text="Lyrics"
         android:layout_width="wrap_content"
-        android:layout_height="50dp"
+        android:layout_height="60dp"
         android:id="@+id/btnShowLyrics"
         android:layout_alignBaseline="@+id/sSaveOffline"
         android:layout_alignBottom="@+id/sSaveOffline"

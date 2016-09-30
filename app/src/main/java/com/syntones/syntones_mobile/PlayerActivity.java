@@ -775,11 +775,7 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
             SharedPreferences.Editor editorSongInfo = sharedPrefSongInfo.edit();
             editorSongInfo.putString("songLyrics", song_lyrics[counter]);
             editorSongInfo.apply();
-
-/*            myHandler.removeCallbacks(UpdateSongTime);
-            mediaPlayer.release();
-            Intent intent = new Intent(PlayerActivity.this, LyricsActivity.class);
-            startActivity(intent);*/
+            startActivity(new Intent(PlayerActivity.this, LyricsActivity.class));
         } else {
             final SyntonesWebAPI syntonesWebAPI = SyntonesWebAPI.Factory.getInstance(sContext);
 

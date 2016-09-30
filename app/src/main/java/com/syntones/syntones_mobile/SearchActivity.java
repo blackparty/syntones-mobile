@@ -16,6 +16,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.syntones.model.Artist;
 import com.syntones.model.Song;
 import com.syntones.remote.SyntonesWebAPI;
 import com.syntones.response.SearchResponse;
@@ -189,16 +190,45 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<SearchResponse> call, Response<SearchResponse> response) {
                 SearchResponse searchResponse = response.body();
-                List<Song> songList = searchResponse.getSongs();
+                List<Song> songListSearch = searchResponse.getSongs();
+                final List<Artist> artistListSearch = searchResponse.getArtists();
+                if (songListSearch != null) {
+                    for (Song a : songListSearch) {
+                        arrayAdapater.add(a.getSongTitle() + "\nby " + a.getArtist().getArtistName());
+                        arrayAdapater.notifyDataSetChanged();
 
-                for (Song s : songList) {
-                    arrayAdapater.add(s.getSongTitle() + "\nby " + s.getArtist().getArtistName());
-                    arrayAdapater.notifyDataSetChanged();
+                    }
+
+                }
+                if (artistListSearch != null) {
+
+                    syntonesWebAPI.getAllSongsFromDB().enqueue(new Callback<SongListResponse>() {
+                        @Override
+                        public void onResponse(Call<SongListResponse> call, Response<SongListResponse> response) {
+                            SongListResponse songListResponse = response.body();
+                            List<Song> songList = songListResponse.getSongs();
+                            Log.d("Search", "Artist");
+                            for (Artist a : artistListSearch) {
+                                for (Song b : songList) {
+                                    if (b.getArtist().getArtistName().equals(a.getArtistName())) {
+                                        Log.d("SearchArtist", b.getArtist().getArtistName() + " - " + a.getArtistName());
+                                        arrayAdapater.add(b.getSongTitle() + "\nby " + b.getArtist().getArtistName());
+                                        arrayAdapater.notifyDataSetChanged();
+                                    }
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<SongListResponse> call, Throwable t) {
+
+                        }
+                    });
 
                 }
 
-                Log.e("Search Response", searchResponse.getMessage().getMessage());
 
+                Log.e("Search Response", searchResponse.getMessage().getMessage());
             }
 
             @Override

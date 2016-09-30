@@ -18,7 +18,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
@@ -98,7 +98,9 @@
         </activity>
         <activity
             android:name=".LyricsActivity"
-            android:label="Lyrics">
+            android:label="Lyrics"
+            android:theme="@style/AppTheme.CustomTheme"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -139,13 +141,6 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".PopUpActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>

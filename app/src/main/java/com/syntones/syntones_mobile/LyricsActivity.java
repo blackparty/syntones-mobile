@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -25,22 +26,15 @@ public class LyricsActivity extends AppCompatActivity {
 
         String song_lyrics = sharedPrefSongInfo.getString("songLyrics", "");
 
+        DisplayMetrics dm = new DisplayMetrics();
+
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+        int width = dm.widthPixels;
+        int height = dm.heightPixels;
+
+        getWindow().setLayout((int) (width * .9), (int) (height * .8));
+
         LyricsTv.setText(song_lyrics);
-
-        HideLyricsBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                hideLyrics();
-            }
-        });
     }
-
-    public void hideLyrics() {
-
-
-        Intent intent = new Intent(this, PlayerActivity.class);
-        startActivity(intent);
-
-    }
-
 }
