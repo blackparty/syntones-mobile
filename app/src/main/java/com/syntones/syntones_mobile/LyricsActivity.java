@@ -20,7 +20,6 @@ public class LyricsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lyrics);
 
-        HideLyricsBtn = (Button) findViewById(R.id.btnHideLyrics);
         LyricsTv = (TextView) findViewById(R.id.tvLyrics);
         SharedPreferences sharedPrefSongInfo = getSharedPreferences("songInfo", Context.MODE_PRIVATE);
 
@@ -37,6 +36,8 @@ public class LyricsActivity extends AppCompatActivity {
     }
 
     public void hideLyrics() {
+
+
         Intent intent = new Intent(this, PlayerActivity.class);
         startActivity(intent);
 

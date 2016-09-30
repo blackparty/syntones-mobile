@@ -11,12 +11,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.syntones.model.Song;
 import com.syntones.remote.SyntonesWebAPI;
+import com.syntones.response.SearchResponse;
 import com.syntones.response.SongListResponse;
 
 import java.util.ArrayList;
@@ -34,6 +36,7 @@ public class SearchActivity extends AppCompatActivity {
     private ListView SearchResultLv;
     private ArrayAdapter<String> arrayAdapater;
     private ArrayList<String> songs = new ArrayList<>();
+    private EditText SearchEt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,13 +45,20 @@ public class SearchActivity extends AppCompatActivity {
 
         SearchBtn = (ImageButton) findViewById(R.id.btnSearchRes);
         SearchResultLv = (ListView) findViewById(R.id.lvSearchResult);
+        SearchEt = (EditText) findViewById(R.id.etSearch);
+
+        final String searchText = SearchEt.getText().toString();
 
         arrayAdapater = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_single_choice, songs);
         SearchResultLv.setAdapter(arrayAdapater);
 
+        displayAllSongs();
+
         SearchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                arrayAdapater.clear();
+                arrayAdapater.notifyDataSetChanged();
                 searchBtn();
             }
         });
@@ -121,7 +131,7 @@ public class SearchActivity extends AppCompatActivity {
                         SharedPreferences sharedPrefActivityInfo = getSharedPreferences("activityInfo", Context.MODE_PRIVATE);
                         SharedPreferences.Editor editorActivityInfo = sharedPrefActivityInfo.edit();
                         editorActivityInfo.putString("activityState", "SearchActivity");
-                        editorActivityInfo.commit();
+                        editorActivityInfo.apply();
 
                         Intent intent = new Intent(SearchActivity.this, PlayerActivity.class);
                         startActivity(intent);
@@ -139,7 +149,7 @@ public class SearchActivity extends AppCompatActivity {
         });
     }
 
-    public void searchBtn() {
+    public void displayAllSongs() {
 
         final SyntonesWebAPI syntonesWebAPI = SyntonesWebAPI.Factory.getInstance(sContext);
 
@@ -166,6 +176,33 @@ public class SearchActivity extends AppCompatActivity {
 
 
                 Log.e("Failed", String.valueOf(t.getMessage()));
+
+            }
+        });
+    }
+
+    public void searchBtn() {
+
+        final SyntonesWebAPI syntonesWebAPI = SyntonesWebAPI.Factory.getInstance(sContext);
+
+        syntonesWebAPI.search(SearchEt.getText().toString()).enqueue(new Callback<SearchResponse>() {
+            @Override
+            public void onResponse(Call<SearchResponse> call, Response<SearchResponse> response) {
+                SearchResponse searchResponse = response.body();
+                List<Song> songList = searchResponse.getSongs();
+
+                for (Song s : songList) {
+                    arrayAdapater.add(s.getSongTitle() + "\nby " + s.getArtist().getArtistName());
+                    arrayAdapater.notifyDataSetChanged();
+
+                }
+
+                Log.e("Search Response", searchResponse.getMessage().getMessage());
+
+            }
+
+            @Override
+            public void onFailure(Call<SearchResponse> call, Throwable t) {
 
             }
         });

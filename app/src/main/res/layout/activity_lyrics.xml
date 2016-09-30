@@ -8,7 +8,8 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.syntones.syntones_mobile.LyricsActivity"
-    android:background="#FFFFFF">
+    android:background="#FFFFFF"
+    android:id="@+id/rlLyrics">
 
 
     <ScrollView
@@ -31,13 +32,4 @@
             android:layout_marginTop="10dp" />
     </ScrollView>
 
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hide Lyrics"
-        android:id="@+id/btnHideLyrics"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:onClick="hideLyrics" />
 </RelativeLayout>

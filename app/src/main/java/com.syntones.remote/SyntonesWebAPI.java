@@ -18,6 +18,7 @@ import com.syntones.response.LogoutResponse;
 import com.syntones.response.PlaylistResponse;
 import com.syntones.response.PlaylistSongsResponse;
 import com.syntones.response.RemovePlaylistResponse;
+import com.syntones.response.SearchResponse;
 import com.syntones.response.SongListResponse;
 import com.syntones.model.TemporaryDB;
 import com.syntones.response.TagsResponse;
@@ -94,6 +95,11 @@ public interface SyntonesWebAPI {
 
     @POST("saveGeneratedPlaylist")
     Call<GeneratePlaylistResponse> saveGeneratedPlaylist(@Body Playlist playlist);
+
+    @POST("search")
+    Call<SearchResponse> search(@Body String search);
+
+
 
     class Factory {
 

@@ -73,7 +73,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 if(loginResponse.getMessage().getFlag()==true){
                     editorUserInfo.putString("username", username);
-                    editorUserInfo.commit();
+                    editorUserInfo.apply();
 
                     LoginMessageTv.setVisibility(View.INVISIBLE);
 

@@ -86,9 +86,8 @@ public class SignupActivity extends AppCompatActivity {
         SyntonesWebAPI syntonesWebAPI = SyntonesWebAPI.Factory.getInstance(sContext);
 
         User user = new User();
-        String encrypted_password = new String(Hex.encodeHex(DigestUtils.md5(password)));
         user.setUsername(username);
-        user.setPassword(encrypted_password);
+        user.setPassword(password);
         user.setDateOfBirth(dateOfBirth);
         user.setEmail(email);
         user.setGender(gender);

@@ -110,12 +110,12 @@ public class ViewPlayListActivity extends AppCompatActivity {
                 editorSongInfo.putString("songTitle", song_info[0]);
                 editorSongInfo.putString("artistName", song_info[1]);
 
-                editorSongInfo.commit();
+                editorSongInfo.apply();
 
                 SharedPreferences sharedPrefActivityInfo = getSharedPreferences("activityInfo", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editorActivityInfo = sharedPrefActivityInfo.edit();
                 editorActivityInfo.putString("activityState", "Playlist");
-                editorActivityInfo.commit();
+                editorActivityInfo.apply();
 
                 Intent intent = new Intent(ViewPlayListActivity.this, PlayerActivity.class);
                 startActivity(intent);
@@ -257,7 +257,7 @@ public class ViewPlayListActivity extends AppCompatActivity {
                             arrayAdapter.notifyDataSetChanged();
                             b++;
                         }
-                        editorPlayedSongInfo.commit();
+                        editorPlayedSongInfo.apply();
                         playlistSongsResponse.setPlaylist(playlist);
 
                         Log.e("Song List Response:", songListResponse.getMessage().getMessage());

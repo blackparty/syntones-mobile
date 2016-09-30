@@ -203,7 +203,7 @@ public class PlayListActivity extends AppCompatActivity {
                                 SharedPreferences.Editor editorPlaylistInfo = sharedPrefPlaylistInfo.edit();
                                 editorPlaylistInfo.putString("playlistName", playlist_name);
                                 editorPlaylistInfo.putString("playlistId", String.valueOf(a.getPlaylistId()));
-                                editorPlaylistInfo.commit();
+                                editorPlaylistInfo.apply();
                                 startActivity(intent);
                             }
                         }

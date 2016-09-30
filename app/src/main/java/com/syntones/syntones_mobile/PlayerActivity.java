@@ -9,16 +9,22 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.view.ViewGroup.LayoutParams;
 import com.syntones.model.Playlist;
 import com.syntones.model.Song;
 import com.syntones.model.TemporaryDB;
@@ -46,22 +52,24 @@ import retrofit2.Response;
 public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnCompletionListener {
 
     private PlayerActivity sContext;
-    private int position, startTime, endTime, count = 0;
+    private PopupWindow popupWindow;
+    private LayoutInflater layoutInflater;
+    private RelativeLayout LyricsRl;
+    private MediaPlayer mediaPlayer;
+    private ListView BasketRecomLv;
+    private Switch SaveOfflineS;
     private String song1, song2, username;
     private Button PreviousBtn, PlayBtn, PauseBtn, NextBtn, ShowLyricsBtn, AddtoPlaylistBtn;
     private TextView SongStartTv, SongEndTv, SongTitleTv, ArtistNameTv, BackToSongListTv;
     private SeekBar SongBarSb;
     private Handler myHandler = new Handler();
-    private int counter = 0, nextSize;
-    //    private final String song_urls[] = {"http://project-tango.org/Projects/TangoBand/Songs/files/01%20La%20Cumparsita.mp3", "http://project-tango.org/Projects/TangoBand/Songs/files/Silueta%20Portena.mp3"};
-    private MediaPlayer mediaPlayer;
-    private ListView BasketRecomLv;
-    private Switch SaveOfflineS;
-    private long playlist_id;
-    private static int THRESHOLD = 50;
     private ArrayAdapter<String> arrayAdapter;
     private ArrayList<String> songs = new ArrayList<>();
     private String[] nextId, nextUrl, nextSongTitle, nextArtistName;
+    private int counter = 0, nextSize;
+    private int position, startTime, endTime, count = 0;
+    private long playlist_id;
+    private static int THRESHOLD = 50;
     private static String IPADDRESS = "http://192.168.137.1";
 
     @Override
@@ -90,6 +98,8 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
         //ListViews
         BasketRecomLv = (ListView) findViewById(R.id.lvBasketRecom);
 
+
+
         SharedPreferences sharedPrefUserInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         username = sharedPrefUserInfo.getString("username", "");
 
@@ -99,14 +109,14 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
         if (!activityState.equals("SearchActivity")) {
             final long playlist_id = Long.parseLong(sharedPrefPlaylistInfo.getString("playlistId", ""));
 
-        }else{
+        } else {
             PreviousBtn.setVisibility(View.INVISIBLE);
             NextBtn.setVisibility(View.INVISIBLE);
         }
 
-        SharedPreferences.Editor editorPlaylistInfo = sharedPrefPlaylistInfo.edit();
+/*        SharedPreferences.Editor editorPlaylistInfo = sharedPrefPlaylistInfo.edit();
         editorPlaylistInfo.clear();
-        editorPlaylistInfo.apply();
+        editorPlaylistInfo.apply();*/
 
 
         SharedPreferences sharedPrefPlayedSongInfo = getSharedPreferences("playedSongInfo", 0);
@@ -271,34 +281,33 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
             SharedPreferences.Editor editorStorage = sharedPrefStorage.edit();
 
 
-
-                count++;
-                if (count == 1) {
-                    Log.d("COUNT 1:", String.valueOf(counter));
-                    editorStorage.putString("song1", songs_ids[counter]);
-                    editorStorage.commit();
-                    song1 = sharedPrefStorage.getString("song1", "");
-
-
-                } else if (count == 2) {
-                    Log.d("COUNT 2:", String.valueOf(counter));
-                    editorStorage.putString("song2", songs_ids[counter]);
-                    editorStorage.commit();
-                    song1 = sharedPrefStorage.getString("song1", "");
-                    song2 = sharedPrefStorage.getString("song2", "");
+            count++;
+            if (count == 1) {
+                Log.d("COUNT 1:", String.valueOf(counter));
+                editorStorage.putString("song1", songs_ids[counter]);
+                editorStorage.apply();
+                song1 = sharedPrefStorage.getString("song1", "");
 
 
-                } else if (count == 3) {
+            } else if (count == 2) {
+                Log.d("COUNT 2:", String.valueOf(counter));
+                editorStorage.putString("song2", songs_ids[counter]);
+                editorStorage.apply();
+                song1 = sharedPrefStorage.getString("song1", "");
+                song2 = sharedPrefStorage.getString("song2", "");
 
-                    editorStorage.putString("song1", sharedPrefStorage.getString("song2", ""));
-                    Log.d("COUNT 3:", String.valueOf(counter));
-                    editorStorage.putString("song2", songs_ids[counter]);
-                    editorStorage.commit();
-                    song1 = sharedPrefStorage.getString("song1", "");
-                    song2 = sharedPrefStorage.getString("song2", "");
-                    count = 0;
 
-                }
+            } else if (count == 3) {
+
+                editorStorage.putString("song1", sharedPrefStorage.getString("song2", ""));
+                Log.d("COUNT 3:", String.valueOf(counter));
+                editorStorage.putString("song2", songs_ids[counter]);
+                editorStorage.apply();
+                song1 = sharedPrefStorage.getString("song1", "");
+                song2 = sharedPrefStorage.getString("song2", "");
+                count = 0;
+
+            }
 
             mediaPlayer.reset();
 
@@ -350,28 +359,24 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
             mediaPlayer.prepare();
             mediaPlayer.start();
 
+            SharedPreferences sharedPrefStorage = getSharedPreferences("storage", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editorStorage = sharedPrefStorage.edit();
 
-        }
+            SyntonesWebAPI syntonesWebAPI = SyntonesWebAPI.Factory.getInstance(sContext);
 
-        SharedPreferences sharedPrefStorage = getSharedPreferences("storage", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editorStorage = sharedPrefStorage.edit();
+            SharedPreferences sharedPrefActivityInfo = getSharedPreferences("activityInfo", Context.MODE_PRIVATE);
 
-        SyntonesWebAPI syntonesWebAPI = SyntonesWebAPI.Factory.getInstance(sContext);
-
-        SharedPreferences sharedPrefActivityInfo = getSharedPreferences("activityInfo", Context.MODE_PRIVATE);
-
-        if (!sharedPrefActivityInfo.getString("activityState", "").equals("SearchActivity")) {
 
             count++;
             if (count == 1) {
                 editorStorage.putString("song1", songs_ids[counter]);
-                editorStorage.commit();
+                editorStorage.apply();
                 song1 = sharedPrefStorage.getString("song1", "");
 
 
             } else if (count == 2) {
                 editorStorage.putString("song2", songs_ids[counter]);
-                editorStorage.commit();
+                editorStorage.apply();
                 song1 = sharedPrefStorage.getString("song1", "");
                 song2 = sharedPrefStorage.getString("song2", "");
 
@@ -380,7 +385,7 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
 
                 editorStorage.putString("song1", sharedPrefStorage.getString("song2", ""));
                 editorStorage.putString("song2", songs_ids[counter]);
-                editorStorage.commit();
+                editorStorage.apply();
                 song1 = sharedPrefStorage.getString("song1", "");
                 song2 = sharedPrefStorage.getString("song2", "");
                 count = 0;
@@ -394,6 +399,9 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
 
 
         }
+
+
+
         endTime = mediaPlayer.getDuration();
         startTime = mediaPlayer.getCurrentPosition();
         SongBarSb.setMax(endTime);
@@ -413,7 +421,7 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
         SongBarSb.setProgress(startTime);
         myHandler.postDelayed(UpdateSongTime, 100);
 
-        if(size!=1){
+        if (size != 1) {
             mediaPlayer.setOnCompletionListener(this);
         }
         PlayBtn.setVisibility(View.INVISIBLE);
@@ -473,13 +481,13 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
             count++;
             if (count == 1) {
                 editorStorage.putString("song1", songs_ids[counter]);
-                editorStorage.commit();
+                editorStorage.apply();
                 song1 = sharedPrefStorage.getString("song1", "");
 
 
             } else if (count == 2) {
                 editorStorage.putString("song2", songs_ids[counter]);
-                editorStorage.commit();
+                editorStorage.apply();
                 song1 = sharedPrefStorage.getString("song1", "");
                 song2 = sharedPrefStorage.getString("song2", "");
 
@@ -488,7 +496,7 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
 
                 editorStorage.putString("song1", sharedPrefStorage.getString("song2", ""));
                 editorStorage.putString("song2", songs_ids[counter]);
-                editorStorage.commit();
+                editorStorage.apply();
                 song1 = sharedPrefStorage.getString("song1", "");
                 song2 = sharedPrefStorage.getString("song2", "");
                 count = 0;
@@ -766,10 +774,12 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
             SharedPreferences sharedPrefSongInfo = getSharedPreferences("songInfo", Context.MODE_PRIVATE);
             SharedPreferences.Editor editorSongInfo = sharedPrefSongInfo.edit();
             editorSongInfo.putString("songLyrics", song_lyrics[counter]);
-            editorSongInfo.commit();
+            editorSongInfo.apply();
 
+/*            myHandler.removeCallbacks(UpdateSongTime);
+            mediaPlayer.release();
             Intent intent = new Intent(PlayerActivity.this, LyricsActivity.class);
-            startActivity(intent);
+            startActivity(intent);*/
         } else {
             final SyntonesWebAPI syntonesWebAPI = SyntonesWebAPI.Factory.getInstance(sContext);
 
@@ -787,7 +797,7 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
                             SharedPreferences sharedPrefSongInfo = getSharedPreferences("songInfo", Context.MODE_PRIVATE);
                             SharedPreferences.Editor editorSongInfo = sharedPrefSongInfo.edit();
                             editorSongInfo.putString("songLyrics", song_lyrics);
-                            editorSongInfo.commit();
+                            editorSongInfo.apply();
 
                             Toast.makeText(getBaseContext(), song_lyrics, Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(PlayerActivity.this, LyricsActivity.class);
@@ -820,14 +830,12 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
         if (activityState.equals("SearchActivity")) {
             myHandler.removeCallbacks(UpdateSongTime);
             mediaPlayer.stop();
-            mediaPlayer.release();
 
             Intent intent = new Intent(PlayerActivity.this, SearchActivity.class);
             startActivity(intent);
         } else {
             myHandler.removeCallbacks(UpdateSongTime);
             mediaPlayer.stop();
-            mediaPlayer.release();
             Intent intent = new Intent(PlayerActivity.this, PlayListActivity.class);
             startActivity(intent);
         }
@@ -848,14 +856,14 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
                 editorSongInfo.putString("songTitle", song_info[0]);
                 editorSongInfo.putString("artistName", song_info[1]);
 
-                editorSongInfo.commit();
+                editorSongInfo.apply();
 
                 SharedPreferences sharedPrefActivityInfo = getSharedPreferences("activityInfo", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editorActivityInfo = sharedPrefActivityInfo.edit();
                 editorActivityInfo.putString("activityState", "SearchActivity");
-                editorActivityInfo.commit();
+                editorActivityInfo.apply();
 
-                Intent intent = new Intent(PlayerActivity.this, SongInfoActivity.class);
+                Intent intent = new Intent(PlayerActivity.this, PlayerActivity.class);
                 startActivity(intent);
 
             }
