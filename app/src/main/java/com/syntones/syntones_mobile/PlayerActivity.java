@@ -25,6 +25,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.view.ViewGroup.LayoutParams;
+
 import com.syntones.model.Playlist;
 import com.syntones.model.Song;
 import com.syntones.model.TemporaryDB;
@@ -70,7 +71,7 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
     private int position, startTime, endTime, count = 0;
     private long playlist_id;
     private static int THRESHOLD = 50;
-    private static String IPADDRESS = "http://192.168.137.1";
+    private static String IPADDRESS = "http://172.20.10.4";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +98,6 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
 
         //ListViews
         BasketRecomLv = (ListView) findViewById(R.id.lvBasketRecom);
-
 
 
         SharedPreferences sharedPrefUserInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
@@ -146,6 +146,7 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
             songs_artists[a] = sharedPrefPlayedSongInfo.getString("song_artists_array" + "_" + a, null);
             songs_lyrics[a] = sharedPrefPlayedSongInfo.getString("song_lyrics_array" + "_" + a, null);
             songs_ids[a] = sharedPrefPlayedSongInfo.getString("song_id_array" + "_" + a, null);
+
             Log.d("SONGURL:", IPADDRESS + songs_urls[a]);
             if (songs_titles[a].equals(currentSongTitlePosition) && songs_artists[a].equals(currentArtistNamePosition)) {
                 counter = a;
@@ -193,6 +194,7 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
 
         editorControllerPref.clear();
         editorControllerPref.apply();
+
         PreviousBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -244,6 +246,7 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
             }
         });
 
+
         AddtoPlaylistBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -267,7 +270,7 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
     }
 
 
-    public void previous(int size, String[] songs_ids, String[] songs_urls, String[] songs_titles, String[] songs_artists, long playlist_id) throws IOException {
+    public void previous(final int size, final String[] songs_ids, final String[] songs_urls, final String[] songs_titles, final String[] songs_artists, final long playlist_id) throws IOException {
 
         if (counter > 0) {
             counter = counter - 1;
@@ -336,7 +339,16 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
 
             SongBarSb.setProgress(startTime);
             myHandler.postDelayed(UpdateSongTime, 100);
-            mediaPlayer.setOnCompletionListener(this);
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    try {
+                        next(size, songs_ids, songs_urls, songs_titles, songs_artists, playlist_id);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
             SongTitleTv.setText(songs_titles[counter]);
             ArtistNameTv.setText(songs_artists[counter]);
             PauseBtn.setVisibility(View.VISIBLE);
@@ -344,7 +356,7 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
         }
     }
 
-    public void play(int size, String[] songs_ids, String[] songs_urls, String[] songs_titles, String[] songs_artists, long playlist_id) throws IOException {
+    public void play(final int size, final String[] songs_ids, final String[] songs_urls, final String[] songs_titles, final String[] songs_artists, final long playlist_id) throws IOException {
         SharedPreferences sharedControllerPref = getSharedPreferences("playerControls", Context.MODE_PRIVATE);
         String isPaused = sharedControllerPref.getString("isPaused", "");
 
@@ -393,13 +405,14 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
 
             getTwoItemSet();
             getThreeItemSet();
+            displayRecommendation();
             arrayAdapter.notifyDataSetChanged();
+            BasketRecomLv.setAdapter(arrayAdapter);
             saveToTemporaryDB(songs_ids[counter], username);
             saveToRecentlyPlayedPlaylist(username);
 
 
         }
-
 
 
         endTime = mediaPlayer.getDuration();
@@ -422,7 +435,16 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
         myHandler.postDelayed(UpdateSongTime, 100);
 
         if (size != 1) {
-            mediaPlayer.setOnCompletionListener(this);
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    try {
+                        next(size, songs_ids, songs_urls, songs_titles, songs_artists, playlist_id);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         }
         PlayBtn.setVisibility(View.INVISIBLE);
         PauseBtn.setVisibility(View.VISIBLE);
@@ -450,24 +472,15 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
         PauseBtn.setVisibility(View.INVISIBLE);
     }
 
-    public void onCompletion(MediaPlayer mediaPlayer) {
 
-        try {
-
-            next(nextSize, nextId, nextUrl, nextSongTitle, nextArtistName, playlist_id);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void next(int size, String[] songs_ids, String[] songs_urls, String[] songs_titles, String[] songs_artists, long playlist_id) throws IOException {
+    public void next(final int size, final String[] songs_ids, final String[] songs_urls, final String[] songs_titles, final String[] songs_artists, final long playlist_id) throws IOException {
 
         SharedPreferences sharedControllerPref = getSharedPreferences("playerControls", Context.MODE_PRIVATE);
         String isPaused = sharedControllerPref.getString("isPaused", "");
 
         SharedPreferences sharedPrefStorage = getSharedPreferences("storage", Context.MODE_PRIVATE);
         SharedPreferences.Editor editorStorage = sharedPrefStorage.edit();
-
+        Log.d("PAUSE", isPaused);
         Log.d("POSITION NEXT: ", String.valueOf(counter));
         if (counter < size) {
 
@@ -477,6 +490,17 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
 
                 counter = 0;
             }
+
+            mediaPlayer.reset();
+
+            mediaPlayer.setDataSource(IPADDRESS + songs_urls[counter]);
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+
+            endTime = mediaPlayer.getDuration();
+            startTime = mediaPlayer.getCurrentPosition();
+            SongBarSb.setMax(endTime);
+
 
             count++;
             if (count == 1) {
@@ -501,44 +525,47 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
                 song2 = sharedPrefStorage.getString("song2", "");
                 count = 0;
             }
-            mediaPlayer.reset();
 
-            mediaPlayer.setDataSource(IPADDRESS + songs_urls[counter]);
-            mediaPlayer.prepare();
-            mediaPlayer.start();
 
-            endTime = mediaPlayer.getDuration();
-            startTime = mediaPlayer.getCurrentPosition();
-            SongBarSb.setMax(endTime);
-
-            SongEndTv.setText(String.format("%d:%d",
-                    TimeUnit.MILLISECONDS.toMinutes((long) endTime),
-                    TimeUnit.MILLISECONDS.toSeconds((long) endTime) -
-                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) endTime)))
-            );
-
-            SongStartTv.setText(String.format("%d:%d",
-                    TimeUnit.MILLISECONDS.toMinutes((long) startTime),
-                    TimeUnit.MILLISECONDS.toSeconds((long) startTime) -
-                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) startTime)))
-            );
-
-            SongBarSb.setProgress(startTime);
-            myHandler.postDelayed(UpdateSongTime, 100);
-            mediaPlayer.setOnCompletionListener(this);
-            SongTitleTv.setText(songs_titles[counter]);
-            ArtistNameTv.setText(songs_artists[counter]);
-            PauseBtn.setVisibility(View.VISIBLE);
-            PlayBtn.setVisibility(View.INVISIBLE);
             arrayAdapter.clear();
             arrayAdapter.notifyDataSetChanged();
             getTwoItemSet();
             getThreeItemSet();
             BasketRecomLv.setAdapter(arrayAdapter);
+            displayRecommendation();
             arrayAdapter.notifyDataSetChanged();
             saveToTemporaryDB(songs_ids[counter], username);
             saveToRecentlyPlayedPlaylist(username);
         }
+
+        SongEndTv.setText(String.format("%d:%d",
+                TimeUnit.MILLISECONDS.toMinutes((long) endTime),
+                TimeUnit.MILLISECONDS.toSeconds((long) endTime) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) endTime)))
+        );
+
+        SongStartTv.setText(String.format("%d:%d",
+                TimeUnit.MILLISECONDS.toMinutes((long) startTime),
+                TimeUnit.MILLISECONDS.toSeconds((long) startTime) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) startTime)))
+        );
+
+        SongBarSb.setProgress(startTime);
+        myHandler.postDelayed(UpdateSongTime, 100);
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                try {
+                    next(size, songs_ids, songs_urls, songs_titles, songs_artists, playlist_id);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        SongTitleTv.setText(songs_titles[counter]);
+        ArtistNameTv.setText(songs_artists[counter]);
+        PauseBtn.setVisibility(View.VISIBLE);
+        PlayBtn.setVisibility(View.INVISIBLE);
 
 
     }
@@ -794,8 +821,6 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
                             SharedPreferences.Editor editorSongInfo = sharedPrefSongInfo.edit();
                             editorSongInfo.putString("songLyrics", song_lyrics);
                             editorSongInfo.apply();
-
-                            Toast.makeText(getBaseContext(), song_lyrics, Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(PlayerActivity.this, LyricsActivity.class);
                             startActivity(intent);
 
@@ -842,28 +867,91 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
         BasketRecomLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String song = String.valueOf(parent.getItemAtPosition(position));
+                final String song = String.valueOf(parent.getItemAtPosition(position));
 
-                SharedPreferences sharedPrefSongInfo = getSharedPreferences("songInfo", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editorSongInfo = sharedPrefSongInfo.edit();
+                SyntonesWebAPI syntonesWebAPI = SyntonesWebAPI.Factory.getInstance(sContext);
 
-                String[] song_info = song.split("\\s(by)\\s");
+                syntonesWebAPI.getAllSongsFromDB().enqueue(new Callback<SongListResponse>() {
+                    @Override
+                    public void onResponse(Call<SongListResponse> call, Response<SongListResponse> response) {
 
-                editorSongInfo.putString("songTitle", song_info[0]);
-                editorSongInfo.putString("artistName", song_info[1]);
+                        SongListResponse songListResponse = response.body();
+                        List<Song> songList = songListResponse.getSongs();
 
-                editorSongInfo.apply();
+                        SharedPreferences sharedPrefPlayedSongInfo = getSharedPreferences("playedSongInfo", 0);
+                        final SharedPreferences.Editor editorPlayedSongInfo = sharedPrefPlayedSongInfo.edit();
 
-                SharedPreferences sharedPrefActivityInfo = getSharedPreferences("activityInfo", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editorActivityInfo = sharedPrefActivityInfo.edit();
-                editorActivityInfo.putString("activityState", "SearchActivity");
-                editorActivityInfo.apply();
+                        SharedPreferences sharedPrefSongInfo = getSharedPreferences("songInfo", Context.MODE_PRIVATE);
+                        final SharedPreferences.Editor editorSongInfo = sharedPrefSongInfo.edit();
 
-                Intent intent = new Intent(PlayerActivity.this, PlayerActivity.class);
-                startActivity(intent);
+                        editorPlayedSongInfo.clear();
+                        editorPlayedSongInfo.apply();
+                        editorSongInfo.clear();
+                        editorSongInfo.apply();
 
+                        String[] song_urls = new String[1];
+                        String[] song_titles = new String[1];
+                        String[] song_artists = new String[1];
+                        String[] song_lyrics = new String[1];
+                        String[] song_ids = new String[1];
+                        editorPlayedSongInfo.putInt("song_url_array" + "_size", song_urls.length);
+
+                        String[] song_info = song.split("\\s(by)\\s");
+
+                        editorSongInfo.putString("songTitle", song_info[0]);
+                        editorSongInfo.putString("artistName", song_info[1]);
+
+                        editorSongInfo.apply();
+
+                        editorSongInfo.apply();
+                        int b = 0;
+                        for (Song a : songList) {
+
+                            if (a.getSongTitle().equals(song_info[0]) && a.getArtist().getArtistName().equals(song_info[1])) {
+
+
+                                song_urls[b] = String.valueOf(a.getFilePath());
+                                song_ids[b] = String.valueOf(a.getSongId());
+                                song_titles[b] = a.getSongTitle();
+                                song_artists[b] = a.getArtist().getArtistName();
+                                song_lyrics[b] = a.getLyrics();
+
+
+                                editorPlayedSongInfo.putString("song_url_array" + "_" + b, song_urls[b]);
+                                editorPlayedSongInfo.putString("song_id_array" + "_" + b, song_ids[b]);
+                                editorPlayedSongInfo.putString("song_titles_array" + "_" + b, song_titles[b]);
+                                editorPlayedSongInfo.putString("song_artists_array" + "_" + b, song_artists[b]);
+                                editorPlayedSongInfo.putString("song_lyrics_array" + "_" + b, song_lyrics[b]);
+                                b++;
+
+
+                            }
+                        }
+                        editorPlayedSongInfo.apply();
+                        myHandler.removeCallbacks(UpdateSongTime);
+                        mediaPlayer.stop();
+                        SharedPreferences sharedPrefActivityInfo = getSharedPreferences("activityInfo", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editorActivityInfo = sharedPrefActivityInfo.edit();
+                        editorActivityInfo.putString("activityState", "SearchActivity");
+                        editorActivityInfo.apply();
+
+                        Intent intent = new Intent(PlayerActivity.this, PlayerActivity.class);
+                        startActivity(intent);
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<SongListResponse> call, Throwable t) {
+
+                    }
+                });
             }
         });
     }
 
+
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+
+    }
 }
