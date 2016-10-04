@@ -35,7 +35,7 @@ public class LoginActivity extends AppCompatActivity {
     @BindView(R.id.btnLogIn)
     private Button login;
     private Button btn_signUp;
-    private TextView LoginMessageTv;
+    private TextView LoginMessageTv, SignUpTv;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +44,30 @@ public class LoginActivity extends AppCompatActivity {
         UsernameEt = (EditText) findViewById(R.id.etUsername);
         PasswordEt = (EditText) findViewById(R.id.etPassword);
         LoginMessageTv = (TextView) findViewById(R.id.tvLoginMessage);
+        SignUpTv = (TextView) findViewById(R.id.tvSignUp);
+
+        UsernameEt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UsernameEt.setText("");
+            }
+        });
+
+        PasswordEt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PasswordEt.setText("");
+            }
+        });
+
+        SignUpTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, SignupActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
     @OnClick(R.id.btnLogIn)

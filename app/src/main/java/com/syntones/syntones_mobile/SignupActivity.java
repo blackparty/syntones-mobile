@@ -26,6 +26,8 @@ import com.syntones.remote.SyntonesWebAPI;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 
+import java.util.Date;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -57,6 +59,35 @@ public class SignupActivity extends AppCompatActivity {
         PasswordEt = (EditText) findViewById(R.id.etPassword);
         DateOfBirthEt = (EditText) findViewById(R.id.etDateOfBirth);
         GenderRg = (RadioGroup) findViewById(R.id.rgGender);
+
+
+        EmailEt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EmailEt.setText("");
+            }
+        });
+
+        UsernameEt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UsernameEt.setText("");
+            }
+        });
+
+        PasswordEt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PasswordEt.setText("");
+            }
+        });
+
+        DateOfBirthEt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DateOfBirthEt.setText("");
+            }
+        });
 
 
     }

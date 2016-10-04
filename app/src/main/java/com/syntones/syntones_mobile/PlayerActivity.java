@@ -50,6 +50,7 @@ import com.syntones.response.SongListResponse;
 import com.syntones.response.ThreeItemSetResponse;
 import com.syntones.response.TwoItemSetResponse;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -125,27 +126,21 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
         SharedPreferences sharedPrefActivityInfo = getSharedPreferences("activityInfo", Context.MODE_PRIVATE);
         final String activityState = sharedPrefActivityInfo.getString("activityState", "");
         SharedPreferences sharedPrefPlaylistInfo = getSharedPreferences("playlistInfo", Context.MODE_PRIVATE);
-        if (!activityState.equals("SearchActivity")) {
+        if (activityState.equals("Playlist")) {
             final long playlist_id = Long.parseLong(sharedPrefPlaylistInfo.getString("playlistId", ""));
 
-        } else {
-            PreviousBtn.setVisibility(View.INVISIBLE);
-            NextBtn.setVisibility(View.INVISIBLE);
+        } else if (activityState.equals("SearchActivity")) {
+            PreviousBtn.setEnabled(false);
+            NextBtn.setEnabled(false);
         }
 
 /*        SharedPreferences.Editor editorPlaylistInfo = sharedPrefPlaylistInfo.edit();
         editorPlaylistInfo.clear();
         editorPlaylistInfo.apply();*/
-        ConnectivityManager connectivityManager
+        final ConnectivityManager connectivityManager
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo wifiInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        NetworkInfo mobileInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-
-        if ((wifiInfo != null && wifiInfo.isConnected()) || (mobileInfo != null && mobileInfo.isConnected())) {
-            Log.d("CONNECTION PLAYER", "TRUE");
-        } else {
-            Log.d("CONNECTION PLAYER", "FALSE");
-        }
+        final NetworkInfo wifiInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        final NetworkInfo mobileInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
 
 
         SharedPreferences sharedPrefPlayedSongInfo = getSharedPreferences("playedSongInfo", 0);
@@ -237,20 +232,44 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
             }
         });
 
-        PlayBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
+        if ((wifiInfo != null && wifiInfo.isConnected()) || (mobileInfo != null && mobileInfo.isConnected())) {
+            Log.d("CONNECTION PLAYER", "TRUE");
 
-                    play(size, songs_ids, songs_urls, songs_titles, songs_artists, playlist_id);
+            PlayBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
 
-                    PlayBtn.setVisibility(View.INVISIBLE);
-                    PauseBtn.setVisibility(View.VISIBLE);
-                } catch (IOException e) {
-                    e.printStackTrace();
+
+                        play(size, songs_ids, songs_urls, songs_titles, songs_artists, playlist_id);
+                        PlayBtn.setEnabled(false);
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
+            });
+
+        } else {
+            Log.d("CONNECTION PLAYER", "FALSE");
+
+            PlayBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+
+
+                        playOffline(songs_urls);
+                        PlayBtn.setEnabled(false);
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+        }
+
 
         PauseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -300,12 +319,22 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
         SaveOfflineSw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (SaveOfflineSw.isChecked()) {
 
-                    saveSongsOffline(username, songs_ids, songs_urls, songs_titles, songs_artists, songs_lyrics);
+                if (isSongSaved(songs_ids[counter], username) == false) {
+                    if (SaveOfflineSw.isChecked()) {
+
+                        saveSongsOffline(username, songs_ids, songs_urls, songs_titles, songs_artists, songs_lyrics);
+                    }
                 }
+
             }
         });
+
+        if (isSongSaved(songs_ids[counter], username) == true) {
+            SaveOfflineSw.setChecked(true);
+            SaveOfflineSw.setClickable(false);
+        }
+
     }
 
     public void saveSongsOffline(final String username, final String[] songs_ids, final String[] songs_urls, final String[] songs_titles, final String[] songs_artists, final String[] songs_lyrics) {
@@ -317,7 +346,7 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
         savedOfflineSongs.setArtistName(songs_artists[counter]);
         savedOfflineSongs.setSongTitle(songs_titles[counter]);
         savedOfflineSongs.setLyrics(songs_lyrics[counter]);
-        savedOfflineSongs.setFilePath(IPADDRESS + songs_urls[counter]);
+        savedOfflineSongs.setFilePath(songs_urls[counter]);
 
         db.insertSavedSong(savedOfflineSongs);
 
@@ -330,6 +359,58 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
         request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
         DownloadManager downloadManager = (DownloadManager) PlayerActivity.this.getSystemService(Context.DOWNLOAD_SERVICE);
         downloadManager.enqueue(request);
+    }
+
+    public boolean isSongSaved(String song_id, String username) {
+
+        boolean isSaved = false;
+
+        DBHelper db = new DBHelper(this);
+
+        ArrayList<SavedOfflineSongs> savedOfflineSongsArrayList = db.getAllSavedOfflineSongsFromUser(username);
+
+        for (SavedOfflineSongs a : savedOfflineSongsArrayList) {
+
+            if (song_id.equals(a.getSongId())) {
+                isSaved = true;
+            }
+
+        }
+        return isSaved;
+    }
+
+    public void playOffline(String[] songs_url) throws IOException {
+
+        File downloadDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DOWNLOADS).getAbsolutePath());
+
+        String fileName = URLUtil.guessFileName(songs_url[counter], null, MimeTypeMap.getFileExtensionFromUrl(songs_url[counter]));
+        File listAllFiles[] = downloadDir.listFiles();
+
+        if (listAllFiles != null && listAllFiles.length > 0) {
+            for (File currentFile : listAllFiles) {
+                if (currentFile.isDirectory()) {
+                    if (currentFile.getName().equals(fileName)) {
+                        Log.d("FILE", currentFile.toString());
+                        mediaPlayer.setDataSource(currentFile.toString());
+                        mediaPlayer.prepare();
+                        mediaPlayer.start();
+                    }
+
+                } else {
+                    if (currentFile.getName().endsWith("")) {
+  
+                        if (currentFile.getName().equals(fileName)) {
+                            Log.d("FILE", currentFile.toString());
+                            mediaPlayer.setDataSource(currentFile.getAbsolutePath());
+                            mediaPlayer.prepare();
+                            mediaPlayer.start();
+                        }
+
+                    }
+                }
+            }
+        }
     }
 
 
@@ -378,8 +459,8 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
             mediaPlayer.reset();
 
             SongTitleTv.setText(songs_titles[counter]);
-            PlayBtn.setVisibility(View.VISIBLE);
-            PauseBtn.setVisibility(View.INVISIBLE);
+            PlayBtn.setEnabled(true);
+            PauseBtn.setEnabled(false);
             mediaPlayer.setDataSource(IPADDRESS + songs_urls[counter]);
             mediaPlayer.prepare();
             mediaPlayer.start();
@@ -414,8 +495,8 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
             });
             SongTitleTv.setText(songs_titles[counter]);
             ArtistNameTv.setText(songs_artists[counter]);
-            PauseBtn.setVisibility(View.VISIBLE);
-            PlayBtn.setVisibility(View.INVISIBLE);
+            PauseBtn.setEnabled(true);
+            PlayBtn.setEnabled(false);
         }
     }
 
@@ -477,7 +558,11 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
             arrayAdapter.notifyDataSetChanged();
             BasketRecomLv.setAdapter(arrayAdapter);
             saveToTemporaryDB(songs_ids[counter], username);
-            saveToRecentlyPlayedPlaylist(username);
+
+            String activityState = sharedPrefActivityInfo.getString("activityState", "");
+            if (activityState.equals("Playlist")) {
+                saveToRecentlyPlayedPlaylist(username);
+            }
 
 
         }
@@ -514,8 +599,8 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
                 }
             });
         }
-        PlayBtn.setVisibility(View.INVISIBLE);
-        PauseBtn.setVisibility(View.VISIBLE);
+        PlayBtn.setEnabled(false);
+
 
     }
 
@@ -536,8 +621,8 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
                 TimeUnit.MILLISECONDS.toMinutes((long) startTime),
                 TimeUnit.MILLISECONDS.toSeconds((long) startTime) -
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) startTime))));
-        PlayBtn.setVisibility(View.VISIBLE);
-        PauseBtn.setVisibility(View.INVISIBLE);
+        PlayBtn.setEnabled(true);
+        PauseBtn.setEnabled(false);
     }
 
 
@@ -603,6 +688,8 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
             displayRecommendation();
             arrayAdapter.notifyDataSetChanged();
             saveToTemporaryDB(songs_ids[counter], username);
+
+
             saveToRecentlyPlayedPlaylist(username);
         }
 
@@ -632,9 +719,9 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
         });
         SongTitleTv.setText(songs_titles[counter]);
         ArtistNameTv.setText(songs_artists[counter]);
-        PauseBtn.setVisibility(View.VISIBLE);
-        PlayBtn.setVisibility(View.INVISIBLE);
 
+        PlayBtn.setEnabled(false);
+        PauseBtn.setEnabled(true);
 
     }
 
@@ -922,10 +1009,13 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
 
             Intent intent = new Intent(PlayerActivity.this, SearchActivity.class);
             startActivity(intent);
-        } else {
+        } else if (activityState.equals("Playlist")) {
 //            myHandler.removeCallbacks(UpdateSongTime);
 //            mediaPlayer.stop();
             Intent intent = new Intent(PlayerActivity.this, PlayListActivity.class);
+            startActivity(intent);
+        } else if (activityState.equals("SavedOffline")) {
+            Intent intent = new Intent(PlayerActivity.this, SavedSongsOfflineActivity.class);
             startActivity(intent);
         }
 

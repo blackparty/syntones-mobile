@@ -53,10 +53,13 @@ public class YourLibraryActivity extends AppCompatActivity {
 
         if ((wifiInfo != null && wifiInfo.isConnected()) || (mobileInfo != null && mobileInfo.isConnected())) {
             Log.d("CONNECTION YL", "TRUE");
+            Log.d("CONNECTION YL", "WIFI " + wifiInfo.isConnected());
+            Log.d("CONNECTION YL", "MOBILE " + mobileInfo.isConnected());
 
         } else {
             Log.d("CONNECTION YL", "FALSE");
-
+            Log.d("CONNECTION YL", "WIFI " + wifiInfo.isConnected());
+            Log.d("CONNECTION YL", "MOBILE " + mobileInfo.isConnected());
 
         }
 

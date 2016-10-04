@@ -95,6 +95,7 @@ public class DemoDownload extends AppCompatActivity {
         });
 
     }
+
     public void playOffline() throws IOException {
 
         mediaPlayer.setDataSource("/storage/sdcard/Download/51651-506351.mp3");
@@ -114,16 +115,19 @@ public class DemoDownload extends AppCompatActivity {
         if (listAllFiles != null && listAllFiles.length > 0) {
             for (File currentFile : listAllFiles) {
                 if (currentFile.isDirectory()) {
-                    if (currentFile.toString().equals(fileName)) {
-                        Log.d("FILE", currentFile.toString());
-                    }
+
+                    Log.d("DIR", currentFile.toString());
+
 
                 } else {
                     if (currentFile.getName().endsWith("")) {
+                        Log.d("FILE", currentFile.toString());
+/*
                         // File absolute path
                         Log.e("File path", currentFile.getAbsolutePath());
                         // File Name
                         Log.e("File path", currentFile.getName());
+*/
 
                     }
                 }
