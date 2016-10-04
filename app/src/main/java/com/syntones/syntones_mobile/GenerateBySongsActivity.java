@@ -15,6 +15,7 @@ import android.widget.ListView;
 
 import com.syntones.model.Playlist;
 import com.syntones.model.Song;
+import com.syntones.model.Tag;
 import com.syntones.model.User;
 import com.syntones.remote.SyntonesWebAPI;
 import com.syntones.response.GeneratePlaylistResponse;
@@ -53,7 +54,8 @@ public class GenerateBySongsActivity extends AppCompatActivity {
 
         if (generateBy.equals("Artists")) {
 
-            final String artistName = extras.get("artistInfo").toString();
+           artistName = extras.get("artistInfo").toString();
+            Log.d("ARTIST NAME", artistName);
             insertGeneratedSongsByArtist(artistName);
 
             arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_single_choice, songs_by_artist_list);
@@ -61,7 +63,7 @@ public class GenerateBySongsActivity extends AppCompatActivity {
 
         } else if (generateBy.equals("Tags")) {
 
-            final String tag = extras.get("tagInfo").toString();
+            tag = extras.get("tagInfo").toString();
             insertGeneratedSongsByTags(tag);
 
             arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_single_choice, songs_by_tag_list);
@@ -76,6 +78,11 @@ public class GenerateBySongsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                if(artistName!=null){
+                    tag="none";
+                }else{
+                    artistName="none";
+                }
                 saveGeneratedPlaylist(generateBy, artistName, tag);
             }
         });
@@ -100,7 +107,7 @@ public class GenerateBySongsActivity extends AppCompatActivity {
                 List<Song> songList = generatePlaylistResponse.getSongs();
 
                 for (Song a : songList) {
-                    arrayAdapter.add(a.getSongTitle() + " by " + a.getArtist());
+                    arrayAdapter.add(a.getSongTitle() + " by " + a.getArtist().getArtistName());
                     arrayAdapter.notifyDataSetChanged();
                 }
 
@@ -130,7 +137,9 @@ public class GenerateBySongsActivity extends AppCompatActivity {
 
         SyntonesWebAPI syntonesWebAPI = SyntonesWebAPI.Factory.getInstance(sContext);
 
-        syntonesWebAPI.generatePlaylistByTags(tag).enqueue(new Callback<GeneratePlaylistResponse>() {
+        Tag tagObject = new Tag();
+        tagObject.setTag(tag);
+        syntonesWebAPI.generatePlaylistByTags(tagObject).enqueue(new Callback<GeneratePlaylistResponse>() {
             @Override
             public void onResponse(Call<GeneratePlaylistResponse> call, Response<GeneratePlaylistResponse> response) {
                 GeneratePlaylistResponse generatePlaylistResponse = response.body();
@@ -141,7 +150,7 @@ public class GenerateBySongsActivity extends AppCompatActivity {
                     arrayAdapter.notifyDataSetChanged();
                 }
 
-                Log.e("GP Response", generatePlaylistResponse.getMessage().getMessage());
+//                Log.e("GP Response", generatePlaylistResponse.getMessage().getMessage());
 
             }
 
@@ -160,6 +169,8 @@ public class GenerateBySongsActivity extends AppCompatActivity {
         String username = sharedPrefUserInfo.getString("username", "");
         final User user = new User();
         user.setUsername(username);
+        final Tag tagObject = new Tag();
+        tagObject.setTag(tag);
         if (generateBy.equals("Artists")) {
 
             syntonesWebAPI.generatePlaylistByArtist(artistName).enqueue(new Callback<GeneratePlaylistResponse>() {
@@ -167,23 +178,24 @@ public class GenerateBySongsActivity extends AppCompatActivity {
                 public void onResponse(Call<GeneratePlaylistResponse> call, Response<GeneratePlaylistResponse> response) {
                     GeneratePlaylistResponse generatePlaylistResponse = response.body();
                     List<Song> songList = generatePlaylistResponse.getSongs();
-                    Song song = new Song();
+                    ArrayList<Song> generatedSongList = new ArrayList<>();
+
 
                     Playlist playlist = new Playlist();
                     playlist.setUser(user);
                     playlist.setPlaylistName(GeneratedPlaylistNameEt.getText().toString());
 
                     for (Song a : songList) {
-
+                        Song song = new Song();
                         song.setSongId(a.getSongId());
                         song.setSongTitle(a.getSongTitle());
                         song.setArtistName(a.getArtist().getArtistName());
                         song.setLyrics(a.getLyrics());
+                        generatedSongList.add(song);
 
-                        songList.add(song);
                     }
 
-                    playlist.setSongs(songList);
+                    playlist.setSongs(generatedSongList);
 
                     syntonesWebAPI.saveGeneratedPlaylist(playlist).enqueue(new Callback<GeneratePlaylistResponse>() {
                         @Override
@@ -209,27 +221,27 @@ public class GenerateBySongsActivity extends AppCompatActivity {
                 }
             });
         } else if (generateBy.equals("Tags")) {
-            syntonesWebAPI.generatePlaylistByTags(tag).enqueue(new Callback<GeneratePlaylistResponse>() {
+            syntonesWebAPI.generatePlaylistByTags(tagObject).enqueue(new Callback<GeneratePlaylistResponse>() {
                 @Override
                 public void onResponse(Call<GeneratePlaylistResponse> call, Response<GeneratePlaylistResponse> response) {
                     GeneratePlaylistResponse generatePlaylistResponse = response.body();
                     List<Song> songList = generatePlaylistResponse.getSongs();
-                    Song song = new Song();
+                    ArrayList<Song> generatedSongList = new ArrayList<>();
                     Playlist playlist = new Playlist();
                     playlist.setUser(user);
                     playlist.setPlaylistName(GeneratedPlaylistNameEt.getText().toString());
 
                     for (Song a : songList) {
-
+                        Song song = new Song();
                         song.setSongId(a.getSongId());
                         song.setSongTitle(a.getSongTitle());
                         song.setArtistName(a.getArtist().getArtistName());
                         song.setLyrics(a.getLyrics());
 
-                        songList.add(song);
+                        generatedSongList.add(song);
                     }
 
-                    playlist.setSongs(songList);
+                    playlist.setSongs(generatedSongList);
 
                     syntonesWebAPI.saveGeneratedPlaylist(playlist).enqueue(new Callback<GeneratePlaylistResponse>() {
                         @Override
@@ -243,7 +255,7 @@ public class GenerateBySongsActivity extends AppCompatActivity {
 
                         }
                     });
-                    Log.e("GP Response", generatePlaylistResponse.getMessage().getMessage());
+//                    Log.e("GP Response", generatePlaylistResponse.getMessage().getMessage());
 
                 }
 

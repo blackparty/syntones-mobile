@@ -8,7 +8,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.syntones.syntones_mobile.SignupActivity"
-    android:background="#2E2E2E">
+    android:background="#ecf0f1">
 
     <TextView
         android:layout_width="wrap_content"
@@ -17,14 +17,14 @@
         android:id="@+id/textView3"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:textColor="#FFFFFF"
+        android:textColor="#34495e"
         android:textSize="12dp" />
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="374dp"
         android:layout_height="330dp"
-        android:background="#363636"
+        android:background="#34495e"
         android:id="@+id/linearLayout2"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
@@ -117,7 +117,7 @@
             android:layout_height="wrap_content"
             android:text="SIGN UP"
             android:id="@+id/btnSignUp"
-            android:background="#6ACA6B"
+            android:background="#1abc9c"
             android:textColor="#FFFFFF"
             android:textSize="15dp"
             android:layout_alignBottom="@+id/linearLayout2"

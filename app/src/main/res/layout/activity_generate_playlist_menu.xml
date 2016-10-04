@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_generate_playlist_menu"
     android:layout_width="match_parent"
@@ -8,20 +9,11 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.syntones.syntones_mobile.GeneratePlaylistMenuActivity">
-
-    <Button
-        android:text="Artist"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="150dp"
-        android:id="@+id/btnByArtist"
-        android:onClick="generateBy" />
+    tools:context="com.syntones.syntones_mobile.GeneratePlaylistMenuActivity"
+    android:background="#ecf0f1">
 
     <TextView
-        android:text="You want to make a playlist by:"
+        android:text="Generate a playlist based on:"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -30,14 +22,23 @@
         android:id="@+id/textView7"
         android:textSize="24sp" />
 
-    <Button
-        android:text="Tags"
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
-        android:id="@+id/btnByTags"
-        android:layout_below="@+id/btnByArtist"
-        android:layout_alignLeft="@+id/btnByArtist"
-        android:layout_alignStart="@+id/btnByArtist"
-        android:onClick="generateBy" />
+        app:srcCompat="@drawable/artistbutton"
+        android:layout_alignTop="@+id/textView7"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/ivArtist" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/lyrics"
+        android:id="@+id/ivTags"
+        android:layout_below="@+id/textView7"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="118dp" />
+
 </RelativeLayout>

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="#ecf0f1"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
@@ -26,14 +27,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:weightSum="1">
+            android:weightSum="1"
+            android:layout_margin="30dp">
 
             <ImageView
-                android:layout_width="115dp"
-                android:layout_height="115dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_account_circle_black_24dp"
-                android:layout_gravity="center_horizontal" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/user_round_icon"
+                android:id="@+id/imageView2" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -51,7 +52,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/btnMakeMeAPlaylist"
-                android:onClick="makeMeAPlaylistBtn" />
+                android:onClick="makeMeAPlaylistBtn"
+                android:background="#95a5a6" />
 
         </LinearLayout>
     </ScrollView>
@@ -59,7 +61,7 @@
     <LinearLayout
         android:id="@+id/bottom_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:weightSum="1">
@@ -109,7 +111,7 @@
 
     <Button
         style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
+        android:layout_width="70dp"
         android:layout_height="wrap_content"
         android:text="Logout"
         android:id="@+id/btnLogout"
@@ -117,6 +119,8 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:onClick="logOut" />
+        android:onClick="logOut"
+        android:background="#e74c3c"
+        android:textColor="#ecf0f1" />
 
 </RelativeLayout>

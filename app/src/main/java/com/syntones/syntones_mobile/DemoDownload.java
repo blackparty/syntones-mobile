@@ -2,21 +2,44 @@ package com.syntones.syntones_mobile;
 
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.Intent;
+import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.webkit.MimeTypeMap;
+import android.webkit.URLUtil;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.syntones.remote.IpAddressSetting;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.SocketException;
+import java.net.URL;
+
 public class DemoDownload extends AppCompatActivity {
 
     private Switch DownloadSw;
-    private DownloadManager downloadManager;
-    private Long downloadReference;
+    private Button GetFileBtn, PlayOfflineBtn;
+    private IpAddressSetting iPAddressSetting = new IpAddressSetting();
+    private String song = "http://" + iPAddressSetting.getiPAddress() + "/songUploaded/51552-643504.mp3";
+    private MediaPlayer mediaPlayer;
+
+    public DemoDownload() throws SocketException {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,48 +47,91 @@ public class DemoDownload extends AppCompatActivity {
         setContentView(R.layout.activity_demo_download);
 
         DownloadSw = (Switch) findViewById(R.id.swDownload);
-
-
+        GetFileBtn = (Button) findViewById(R.id.btnGetFile);
+        PlayOfflineBtn = (Button) findViewById(R.id.btnPlayOffline);
+        mediaPlayer = new MediaPlayer();
         DownloadSw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
                 if (DownloadSw.isChecked()) {
+                    Log.d("SWITCH IS:", "ON");
 
-
-
-                    // Create request for android download manager
-                    downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-                    Uri song_uri = Uri.parse("http://192.168.137.1/songUploaded/51552-643504.mp3");
-                    DownloadManager.Request request = new DownloadManager.Request(song_uri);
-
-/*                    //Setting title of request
-                    request.setTitle("Data Download");
-
-                    //Setting description of request
-                    request.setDescription("Android Data download using DownloadManager.");*/
-
-                    //Set the local destination for the downloaded file to a path
-                    //within the application's external files directory
+                    DownloadManager.Request request = new DownloadManager.Request(Uri.parse(song));
+                    String fileName = URLUtil.guessFileName(song, null, MimeTypeMap.getFileExtensionFromUrl(song));
+                    request.setTitle(fileName);
+                    request.allowScanningByMediaScanner();
                     request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
 
-
-/*                    request.setDestinationInExternalFilesDir(DemoDownload.this,
-                            Environment.DIRECTORY_DOWNLOADS, "AndroidTutorialPoint.mp3");*/
-
-
-                    //Enqueue download and save into referenceId
-                    downloadReference = downloadManager.enqueue(request);
+                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
+                    DownloadManager downloadManager = (DownloadManager) DemoDownload.this.getSystemService(Context.DOWNLOAD_SERVICE);
+                    downloadManager.enqueue(request);
 
 
-                    Log.d("SWITCH IS:", "ON");
                 } else {
                     Log.d("SWITCH IS:", "OFF");
                 }
             }
         });
 
+        GetFileBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                getFile();
+
+            }
+        });
+
+        PlayOfflineBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    playOffline();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+    }
+    public void playOffline() throws IOException {
+
+        mediaPlayer.setDataSource("/storage/sdcard/Download/51651-506351.mp3");
+        mediaPlayer.prepare();
+        mediaPlayer.start();
+
+
+    }
+
+    public void getFile() {
+        File downloadDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DOWNLOADS).getAbsolutePath());
+
+        String fileName = URLUtil.guessFileName(song, null, MimeTypeMap.getFileExtensionFromUrl(song));
+        File listAllFiles[] = downloadDir.listFiles();
+
+        if (listAllFiles != null && listAllFiles.length > 0) {
+            for (File currentFile : listAllFiles) {
+                if (currentFile.isDirectory()) {
+                    if (currentFile.toString().equals(fileName)) {
+                        Log.d("FILE", currentFile.toString());
+                    }
+
+                } else {
+                    if (currentFile.getName().endsWith("")) {
+                        // File absolute path
+                        Log.e("File path", currentFile.getAbsolutePath());
+                        // File Name
+                        Log.e("File path", currentFile.getName());
+
+                    }
+                }
+            }
+        }
     }
 
 
 }
+
+

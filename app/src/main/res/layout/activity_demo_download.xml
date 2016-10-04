@@ -18,4 +18,24 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="112dp"
         android:id="@+id/swDownload" />
+
+    <Button
+        android:text="Get File"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/swDownload"
+        android:layout_alignLeft="@+id/swDownload"
+        android:layout_alignStart="@+id/swDownload"
+        android:layout_marginTop="129dp"
+        android:id="@+id/btnGetFile" />
+
+    <Button
+        android:text="Play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnGetFile"
+        android:layout_alignRight="@+id/btnGetFile"
+        android:layout_alignEnd="@+id/btnGetFile"
+        android:layout_marginTop="33dp"
+        android:id="@+id/btnPlayOffline" />
 </RelativeLayout>

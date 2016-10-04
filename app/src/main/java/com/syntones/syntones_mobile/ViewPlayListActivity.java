@@ -3,6 +3,8 @@ package com.syntones.syntones_mobile;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -63,8 +65,13 @@ public class ViewPlayListActivity extends AppCompatActivity {
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_single_choice, songs);
         ViewPlaylistLv.setAdapter(arrayAdapter);
 
+
         insertSongList();
+
+
         displayViewSongList();
+
+
         EditSongBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -283,4 +290,5 @@ public class ViewPlayListActivity extends AppCompatActivity {
         });
 
     }
+
 }

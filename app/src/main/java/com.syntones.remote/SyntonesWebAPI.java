@@ -8,6 +8,7 @@ import android.content.Context;
 
 import com.syntones.model.Playlist;
 import com.syntones.model.PlaylistSong;
+import com.syntones.model.Tag;
 import com.syntones.model.User;
 import com.syntones.response.ArtistResponse;
 import com.syntones.response.GeneratePlaylistResponse;
@@ -25,6 +26,7 @@ import com.syntones.response.TagsResponse;
 import com.syntones.response.ThreeItemSetResponse;
 import com.syntones.response.TwoItemSetResponse;
 
+
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +39,10 @@ import retrofit2.http.POST;
 
 public interface SyntonesWebAPI {
 
-    String ENDPOINT = "http://172.20.10.4:8082/syntones-web/";
+    IpAddressSetting iPAddresSetting = new IpAddressSetting();
+
+
+    String ENDPOINT = "http://" + iPAddresSetting.getiPAddress() + ":8082/syntones-web/";
 
     @POST("register")
     Call<User> createUser(@Body User user);
@@ -91,14 +96,13 @@ public interface SyntonesWebAPI {
     Call<GeneratePlaylistResponse> generatePlaylistByArtist(@Body String artistName);
 
     @POST("generatePlaylistByTags")
-    Call<GeneratePlaylistResponse> generatePlaylistByTags(@Body String tag);
+    Call<GeneratePlaylistResponse> generatePlaylistByTags(@Body Tag tag);
 
     @POST("saveGeneratedPlaylist")
     Call<GeneratePlaylistResponse> saveGeneratedPlaylist(@Body Playlist playlist);
 
     @POST("search")
     Call<SearchResponse> search(@Body String search);
-
 
 
     class Factory {

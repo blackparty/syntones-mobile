@@ -9,10 +9,11 @@ import java.util.List;
 
 public class TagsResponse {
 
+
 	private Message message;
-	private List<Tag> tags;
-	
-	
+	private List<String> tags;
+
+
 	public TagsResponse(){}
 
 
@@ -26,15 +27,16 @@ public class TagsResponse {
 	}
 
 
-	public List<Tag> getTags() {
+	public List<String> getTags() {
 		return tags;
 	}
 
 
-	public void setTags(List<Tag> tags) {
+	public void setTags(List<String> tags) {
 		this.tags = tags;
 	}
-	
-	
-	
+
+
+
+
 }

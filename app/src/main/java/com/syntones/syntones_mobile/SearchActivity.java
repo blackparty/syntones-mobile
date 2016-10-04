@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -38,6 +39,7 @@ public class SearchActivity extends AppCompatActivity {
     private ArrayAdapter<String> arrayAdapater;
     private ArrayList<String> songs = new ArrayList<>();
     private EditText SearchEt;
+    private ImageView SearchIv, LibraryIv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,7 @@ public class SearchActivity extends AppCompatActivity {
         SearchBtn = (ImageButton) findViewById(R.id.btnSearchRes);
         SearchResultLv = (ListView) findViewById(R.id.lvSearchResult);
         SearchEt = (EditText) findViewById(R.id.etSearch);
+        LibraryIv = (ImageView) findViewById(R.id.ivLibrary);
 
         final String searchText = SearchEt.getText().toString();
 
@@ -54,6 +57,15 @@ public class SearchActivity extends AppCompatActivity {
         SearchResultLv.setAdapter(arrayAdapater);
 
         displayAllSongs();
+
+
+        LibraryIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SearchActivity.this, YourLibraryActivity.class);
+                startActivity(intent);
+            }
+        });
 
         SearchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -239,21 +251,5 @@ public class SearchActivity extends AppCompatActivity {
 
     }
 
-    public void bottomBar(View view) {
-        String btnText;
 
-        btnText = ((Button) view).getText().toString();
-
-        if (btnText.equals("Home")) {
-
-            Intent intent = new Intent(this, HomeActivity.class);
-            startActivity(intent);
-
-        } else if (btnText.equals("Your Library")) {
-
-            Intent intent = new Intent(this, YourLibraryActivity.class);
-            startActivity(intent);
-        }
-
-    }
 }

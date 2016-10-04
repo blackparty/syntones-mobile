@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_player"
     android:layout_width="match_parent"
@@ -8,7 +9,8 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.syntones.syntones_mobile.PlayerActivity">
+    tools:context="com.syntones.syntones_mobile.PlayerActivity"
+    android:background="#ecf0f1">
 
 
     <TableRow
@@ -55,7 +57,7 @@
             android:id="@+id/tvSongTitle"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginLeft="135dp"
+            android:layout_marginLeft="150dp"
             android:textColor="#000000" />
 
         <TextView
@@ -66,7 +68,7 @@
             android:layout_below="@+id/tvSongTitle"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="20dp"
-            android:layout_marginLeft="130dp"
+            android:layout_marginLeft="143dp"
             android:textColor="#000000" />
 
         <SeekBar
@@ -78,14 +80,6 @@
             android:layout_alignParentStart="true"
             android:layout_marginTop="50dp" />
 
-        <Button
-            android:text="+"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_below="@+id/sSaveOffline"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:id="@+id/btnAddToPlaylist" />
     </FrameLayout>
 
     <TableRow
@@ -161,26 +155,34 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:id="@+id/sSaveOffline" />
+        android:id="@+id/swSaveOffline" />
 
-    <TextView
-        android:text=">"
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/tvBackToSongList"
-        android:textColor="#000000"
-        android:textSize="36sp"
-        android:layout_alignTop="@+id/btnShowLyrics"
+        app:srcCompat="@drawable/left_arrow"
+        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:id="@+id/ivBack" />
 
     <Button
-        android:text="Lyrics"
-        android:layout_width="wrap_content"
-        android:layout_height="60dp"
-        android:id="@+id/btnShowLyrics"
-        android:layout_alignBaseline="@+id/sSaveOffline"
-        android:layout_alignBottom="@+id/sSaveOffline"
+        android:text="+"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:id="@+id/btnAddToPlaylist"
+        android:background="#1abc9c"
+        android:textColor="#ecf0f1"
+        android:layout_below="@+id/ivShowLyrics"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <ImageView
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/show_lyrics"
+        android:id="@+id/ivShowLyrics"
+        android:layout_width="70dp"
+        android:layout_alignParentTop="true"
         android:layout_alignRight="@+id/textView12"
         android:layout_alignEnd="@+id/textView12" />
 

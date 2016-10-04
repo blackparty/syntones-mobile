@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -27,6 +30,7 @@ public class YourLibraryActivity extends AppCompatActivity {
 
 
     private ListView RecentlyPlayedLv;
+    private ImageView SearchIv, LibraryIv, ViewPlaylistsIv, ViewSavedSongsOfflineIv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,68 +39,58 @@ public class YourLibraryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_your_library);
 
-        RecentlyPlayedLv = (ListView) findViewById(R.id.lvRecentlyPlayed);
+        ViewPlaylistsIv = (ImageView) findViewById(R.id.ivViewPlaylists);
+        ViewSavedSongsOfflineIv = (ImageView) findViewById(R.id.ivViewSavedSongsOffline);
 
-//        ArrayAdapter<Product> arrayAdapter = new ArrayAdapter<Product>(this, android.R.layout.simple_list_item_1, items);
-//        RecentlyPlayedLv.setAdapter(arrayAdapter);
-        RecentlyPlayedLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        SearchIv = (ImageView) findViewById(R.id.ivSearch);
+        LibraryIv = (ImageView) findViewById(R.id.ivLibrary);
+
+
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo wifiInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        NetworkInfo mobileInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+
+        if ((wifiInfo != null && wifiInfo.isConnected()) || (mobileInfo != null && mobileInfo.isConnected())) {
+            Log.d("CONNECTION YL", "TRUE");
+
+        } else {
+            Log.d("CONNECTION YL", "FALSE");
+
+
+        }
+
+        SearchIv.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String playlist = String.valueOf(parent.getItemAtPosition(position));
-                Intent intent = new Intent(YourLibraryActivity.this, PlayListActivity.class);
-                intent.putExtra("Info", playlist);
+            public void onClick(View v) {
+
+                Intent intent = new Intent(YourLibraryActivity.this, SearchActivity.class);
                 startActivity(intent);
-                Toast.makeText(getBaseContext(), playlist, Toast.LENGTH_SHORT).show();
+
             }
+        });
 
+        ViewPlaylistsIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(YourLibraryActivity.this, PlayListActivity.class);
+                startActivity(intent);
+            }
+        });
 
+        ViewSavedSongsOfflineIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(YourLibraryActivity.this, SavedSongsOfflineActivity.class);
+                startActivity(intent);
+            }
         });
 
     }
 
-
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.yourlibrary, menu);
         return super.onCreateOptionsMenu(menu);
-    }
-
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.action_profile:
-                Intent intent = new Intent(this, ProfileActivity.class);
-                startActivity(intent);
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-
-    }
-
-
-    public void bottomBar(View view) {
-        String btnText;
-
-        btnText = ((Button) view).getText().toString();
-
-        if (btnText.equals("Home")) {
-
-            Intent intent = new Intent(this, HomeActivity.class);
-            startActivity(intent);
-
-        } else if (btnText.equals("Search")) {
-
-            Intent intent = new Intent(this, SearchActivity.class);
-            startActivity(intent);
-        }
-
-    }
-
-    public void viewPlayLists(View view) {
-
-        Intent intent = new Intent(this, PlayListActivity.class);
-        startActivity(intent);
-
     }
 
 

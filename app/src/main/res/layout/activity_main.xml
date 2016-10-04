@@ -9,8 +9,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
 
     tools:context=".MainActivity"
-    android:background="@drawable/main_activity_bg"
-    >
+    android:background="#ecf0f1">
 
 
     <LinearLayout
@@ -33,10 +32,10 @@
             android:height="65dp"
             android:width="192dp"
             android:layout_weight="0.06"
-            android:backgroundTint="#434343"
             android:textColor="#FFFFFF"
             android:onClick="showScreen"
-            android:id="@+id/logInBtn" />
+            android:id="@+id/logInBtn"
+            android:background="#7f8c8d" />
     </LinearLayout>
     </LinearLayout>
 
@@ -44,13 +43,13 @@
         android:layout_width="162dp"
         android:layout_height="wrap_content"
         android:text="SIGN UP"
+        android:width="192dp"
+        android:height="65dp"
+        android:textColor="#FFFFFF"
+        android:onClick="showScreen"
+        android:id="@+id/signUpBtn"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:width="192dp"
-        android:height="65dp"
-        android:backgroundTint="#6ACA6B"
-        android:textColor="#FFFFFF"
-        android:onClick="showScreen"
-        android:id="@+id/signUpBtn" />
+        android:background="#1abc9c" />
 </RelativeLayout>

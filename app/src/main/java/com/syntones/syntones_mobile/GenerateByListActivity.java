@@ -55,7 +55,7 @@ public class GenerateByListActivity extends AppCompatActivity {
 
         } else if (generateBy.equals("Tags")) {
 
-            this.insertAllTagss();
+            this.insertAllTags();
 
             arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_single_choice, tag_list);
             GenerateByLv.setAdapter(arrayAdapter);
@@ -106,7 +106,7 @@ public class GenerateByListActivity extends AppCompatActivity {
         });
     }
 
-    public void insertAllTagss() {
+    public void insertAllTags() {
 
         SyntonesWebAPI syntonesWebAPI = SyntonesWebAPI.Factory.getInstance(sContext);
 
@@ -114,11 +114,11 @@ public class GenerateByListActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<TagsResponse> call, Response<TagsResponse> response) {
                 TagsResponse tagsResponse = response.body();
-                List<Tag> tagList = tagsResponse.getTags();
+                List<String> tagList = tagsResponse.getTags();
 
-                for (Tag a : tagList) {
+                for (String a : tagList) {
 
-                    arrayAdapter.add(a.getTag());
+                    arrayAdapter.add(a);
                     arrayAdapter.notifyDataSetChanged();
                 }
 

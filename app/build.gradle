@@ -39,7 +39,7 @@ dependencies {
     compile "com.squareup.retrofit2:adapter-rxjava:2.1.0"
     compile 'com.squareup.okhttp3:logging-interceptor:3.4.0'
 
-
+    compile 'com.scottyab:aescrypt:0.0.1'
 
     compile 'com.google.code.gson:gson:2.6.2'
 

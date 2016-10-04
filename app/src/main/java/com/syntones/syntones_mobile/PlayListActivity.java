@@ -4,6 +4,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -56,6 +58,8 @@ public class PlayListActivity extends AppCompatActivity {
 
         insertPlaylist();
         displayViewPlaylistList();
+
+
         EditBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -175,6 +179,7 @@ public class PlayListActivity extends AppCompatActivity {
         });
     }
 
+
     public void displayViewPlaylistList() {
         PlaylistsLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -231,6 +236,10 @@ public class PlayListActivity extends AppCompatActivity {
         String username = sharedPrefUserInfo.getString("username", "");
         User user = new User();
         user.setUsername(username);
+        SharedPreferences sharedPrefPlaylistInfo = getSharedPreferences("playedSongInfo", 0);
+        SharedPreferences sharedPrefPlaylistInfoOffline = getSharedPreferences("playedSongInfoOffline", 0);
+        final SharedPreferences.Editor editorPlaylistInfo = sharedPrefPlaylistInfo.edit();
+        final SharedPreferences.Editor editorPlaylistInfoOffline = sharedPrefPlaylistInfoOffline.edit();
         syntonesWebAPI.getPlaylistFromDB(user).enqueue(new Callback<PlaylistResponse>() {
             @Override
             public void onResponse(Call<PlaylistResponse> call, Response<PlaylistResponse> response) {
@@ -240,12 +249,17 @@ public class PlayListActivity extends AppCompatActivity {
                 List<Playlist> playlists = playlistResponse.getPlaylists();
 
                 if (playlists != null) {
-                    for (Playlist a : playlists) {
+                    for (int a = 0; a < playlists.size(); a++) {
 
-                        arrayAdapter.add(a.getPlaylistName());
+
+                        arrayAdapter.add(playlists.get(a).getPlaylistName());
                         arrayAdapter.notifyDataSetChanged();
+
                     }
                 }
+                editorPlaylistInfo.apply();
+                editorPlaylistInfoOffline.apply();
+
                 Log.e("Playlist Response: ", playlistResponse.getMessage().getMessage());
             }
 
@@ -256,6 +270,7 @@ public class PlayListActivity extends AppCompatActivity {
         });
 
     }
+
 
     public void editPlaylist(View view) {
 
@@ -413,26 +428,4 @@ public class PlayListActivity extends AppCompatActivity {
         }
     }
 
-
-    public void bottomBar(View view) {
-        String btnText;
-
-        btnText = ((Button) view).getText().toString();
-
-        if (btnText.equals("Home")) {
-
-            Intent intent = new Intent(this, HomeActivity.class);
-            startActivity(intent);
-
-        } else if (btnText.equals("Search")) {
-
-            Intent intent = new Intent(this, SearchActivity.class);
-            startActivity(intent);
-        } else if (btnText.equals("Your Library")) {
-
-            Intent intent = new Intent(this, YourLibraryActivity.class);
-            startActivity(intent);
-        }
-
-    }
 }

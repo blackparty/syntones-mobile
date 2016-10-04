@@ -8,7 +8,8 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.syntones.syntones_mobile.GenerateByListActivity">
+    tools:context="com.syntones.syntones_mobile.GenerateByListActivity"
+    android:background="#ecf0f1">
 
     <TextView
         android:text="Generate By"
@@ -18,7 +19,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:id="@+id/tvGenerateBy"
-        android:textSize="24sp" />
+        android:textSize="24sp"
+        android:textColor="#34495e" />
 
     <ListView
         android:layout_width="match_parent"
@@ -26,5 +28,6 @@
         android:layout_below="@+id/tvGenerateBy"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
-        android:id="@+id/lvGenerateBy" />
+        android:id="@+id/lvGenerateBy"
+        android:backgroundTint="#ecf0f1" />
 </RelativeLayout>

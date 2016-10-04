@@ -8,7 +8,8 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.syntones.syntones_mobile.GenerateBySongsActivity">
+    tools:context="com.syntones.syntones_mobile.GenerateBySongsActivity"
+    android:background="#ecf0f1">
 
     <ListView
         android:layout_width="match_parent"
@@ -16,7 +17,8 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="58dp"
-        android:id="@+id/lvGeneratedSongsBy" />
+        android:id="@+id/lvGeneratedSongsBy"
+        android:backgroundTint="#ecf0f1" />
 
     <EditText
         android:layout_width="match_parent"
@@ -31,7 +33,7 @@
 
     <Button
         android:text="Save"
-        android:layout_width="wrap_content"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:layout_below="@+id/lvGeneratedSongsBy"
         android:layout_alignParentLeft="true"
@@ -40,11 +42,13 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="14dp"
         android:id="@+id/btnSaveGeneratedPlaylist"
-        android:onClick="saveGeneratedPlaylist" />
+        android:onClick="saveGeneratedPlaylist"
+        android:background="#1abc9c"
+        android:textColor="#ecf0f1" />
 
     <Button
         android:text="Cancel"
-        android:layout_width="wrap_content"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/btnSaveGeneratedPlaylist"
         android:layout_alignParentRight="true"
@@ -52,5 +56,7 @@
         android:layout_marginRight="27dp"
         android:layout_marginEnd="27dp"
         android:id="@+id/btnCancelGeneratedPlaylist"
-        android:onClick="cancelGeneratedPlaylist" />
+        android:onClick="cancelGeneratedPlaylist"
+        android:background="#e74c3c"
+        android:textColor="#ecf0f1" />
 </RelativeLayout>
