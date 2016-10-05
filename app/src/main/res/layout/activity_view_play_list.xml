@@ -54,13 +54,25 @@
                 android:layout_marginLeft="230dp"
                 android:onClick="editSong" />
 
-            <Button
-                android:text="Remove"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/btnRemoveSong"
-                android:onClick="removeSong"
-                android:visibility="invisible" />
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+                <Button
+                    android:text="Add"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/btnAddSong"
+                    android:visibility="invisible" />
+
+                <Button
+                    android:text="Remove"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/btnRemoveSong"
+                    android:onClick="removeSong"
+                    android:visibility="invisible" />
+            </TableRow>
 
             <ListView
                 android:layout_width="match_parent"

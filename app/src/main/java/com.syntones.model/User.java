@@ -5,6 +5,7 @@ package com.syntones.model;
  */
 public class User {
 
+    private long userId;
     private String username, password, email, dateOfBirth, gender;
 
     public User() {
@@ -14,12 +15,21 @@ public class User {
         this.username = username;
     }
 
-    public User(String username, String password, String email, String dateOfBirth, String gender) {
+    public User(long userId, String username, String password, String email, String dateOfBirth, String gender) {
+        this.userId = userId;
         this.username = username;
         this.password = password;
         this.email = email;
         this.dateOfBirth = dateOfBirth;
         this.gender = gender;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 
     public String getUsername() {

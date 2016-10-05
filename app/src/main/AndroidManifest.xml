@@ -144,16 +144,24 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".DemoDownload">
+        <activity
+            android:name=".SavedSongsOfflineActivity"
+            android:label="Saved Songs Offline"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".SavedSongsOfflineActivity"
-            android:label="Saved Songs Offline"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
+        <activity android:name=".AddSongsActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".DeleteFilesActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

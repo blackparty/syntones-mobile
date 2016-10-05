@@ -90,6 +90,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 LoginResponse loginResponse = response.body();
+                User user = loginResponse.getUser();
 
 
                 SharedPreferences sharedPrefUserInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
@@ -97,6 +98,8 @@ public class LoginActivity extends AppCompatActivity {
 
                 if(loginResponse.getMessage().getFlag()==true){
                     editorUserInfo.putString("username", username);
+                    editorUserInfo.putLong("userID", user.getUserId());
+                    Log.d("USER ID", String.valueOf(user.getUserId()));
                     editorUserInfo.apply();
 
                     LoginMessageTv.setVisibility(View.INVISIBLE);

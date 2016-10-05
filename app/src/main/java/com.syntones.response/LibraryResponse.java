@@ -13,8 +13,10 @@ public class LibraryResponse {
     private Message message;
     private List<Playlist> recentlyPlayedPlaylists;
 
+
     public LibraryResponse() {
     }
+
 
 
     public LibraryResponse(User user, Message message, List<Playlist> recentlyPlayedPlaylists) {
@@ -38,6 +40,5 @@ public class LibraryResponse {
     public void setRecentlyPlayedPlaylists(List<Playlist> recentPlaylistsPlayed) {
         this.recentlyPlayedPlaylists = recentPlaylistsPlayed;
     }
-
 
 }

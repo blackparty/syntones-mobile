@@ -1,8 +1,10 @@
 package com.syntones.syntones_mobile;
 
 import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -14,11 +16,8 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.webkit.URLUtil;
 import android.widget.AdapterView;
@@ -33,7 +32,6 @@ import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.view.ViewGroup.LayoutParams;
 
 import com.syntones.model.Playlist;
 import com.syntones.model.SavedOfflineSongs;
@@ -53,9 +51,7 @@ import com.syntones.response.TwoItemSetResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
@@ -73,7 +69,7 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
     private ImageView BackIv, ShowLyricsIv;
     private ListView BasketRecomLv;
     private Switch SaveOfflineSw;
-    private String song1, song2, username;
+    private String song1, song2, username, userID;
     private Button PreviousBtn, PlayBtn, PauseBtn, NextBtn, AddtoPlaylistBtn;
     private TextView SongStartTv, SongEndTv, SongTitleTv, ArtistNameTv;
     private SeekBar SongBarSb;
@@ -92,6 +88,7 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
+
 
         //Buttons
         PreviousBtn = (Button) findViewById(R.id.btnPrev);
@@ -122,6 +119,7 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
 
         SharedPreferences sharedPrefUserInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         username = sharedPrefUserInfo.getString("username", "");
+        userID = String.valueOf(sharedPrefUserInfo.getLong("userID", 0));
 
         SharedPreferences sharedPrefActivityInfo = getSharedPreferences("activityInfo", Context.MODE_PRIVATE);
         final String activityState = sharedPrefActivityInfo.getString("activityState", "");
@@ -225,50 +223,38 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
                 try {
                     editorControllerPref.putString("isPaused", "notPaused");
                     editorControllerPref.apply();
-                    previous(size, songs_ids, songs_urls, songs_titles, songs_artists, playlist_id);
+                    if ((wifiInfo != null && wifiInfo.isConnected()) || (mobileInfo != null && mobileInfo.isConnected())) {
+                        Log.d("PLAY OFFLINE", "FALSE");
+                        previous(size, songs_ids, songs_urls, songs_titles, songs_artists, playlist_id);
+                    } else {
+                        Log.d("PLAY OFFLINE", "TRUE");
+                        previousOffline(size, songs_ids, songs_urls, songs_titles, songs_artists, userID);
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         });
 
-        if ((wifiInfo != null && wifiInfo.isConnected()) || (mobileInfo != null && mobileInfo.isConnected())) {
-            Log.d("CONNECTION PLAYER", "TRUE");
+        PlayBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
 
-            PlayBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    try {
-
-
+                    if ((wifiInfo != null && wifiInfo.isConnected()) || (mobileInfo != null && mobileInfo.isConnected())) {
+                        Log.d("PLAY OFFLINE", "FALSE");
                         play(size, songs_ids, songs_urls, songs_titles, songs_artists, playlist_id);
-                        PlayBtn.setEnabled(false);
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    } else {
+                        Log.d("PLAY OFFLINE", "TRUE");
+                        playOffline(size, songs_ids, songs_urls, songs_titles, songs_artists, userID);
                     }
+                    PlayBtn.setEnabled(false);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            });
-
-        } else {
-            Log.d("CONNECTION PLAYER", "FALSE");
-
-            PlayBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    try {
-
-
-                        playOffline(songs_urls);
-                        PlayBtn.setEnabled(false);
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-
-        }
+            }
+        });
 
 
         PauseBtn.setOnClickListener(new View.OnClickListener() {
@@ -287,7 +273,12 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
                 try {
                     editorControllerPref.putString("isPaused", "notPaused");
                     editorControllerPref.apply();
-                    next(size, songs_ids, songs_urls, songs_titles, songs_artists, playlist_id);
+                    if ((wifiInfo != null && wifiInfo.isConnected()) || (mobileInfo != null && mobileInfo.isConnected())) {
+                        Log.d("PLAY OFFLINE", "FALSE");
+                        next(size, songs_ids, songs_urls, songs_titles, songs_artists, playlist_id);
+                    } else {
+                        nextOffline(size, songs_ids, songs_urls, songs_titles, songs_artists, userID);
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -323,7 +314,7 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
                 if (isSongSaved(songs_ids[counter], username) == false) {
                     if (SaveOfflineSw.isChecked()) {
 
-                        saveSongsOffline(username, songs_ids, songs_urls, songs_titles, songs_artists, songs_lyrics);
+                        saveSongsOffline(userID, songs_ids, songs_urls, songs_titles, songs_artists, songs_lyrics);
                     }
                 }
 
@@ -337,11 +328,11 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
 
     }
 
-    public void saveSongsOffline(final String username, final String[] songs_ids, final String[] songs_urls, final String[] songs_titles, final String[] songs_artists, final String[] songs_lyrics) {
+    public void saveSongsOffline(final String userID, final String[] songs_ids, final String[] songs_urls, final String[] songs_titles, final String[] songs_artists, final String[] songs_lyrics) {
         DBHelper db = new DBHelper(PlayerActivity.this);
         SavedOfflineSongs savedOfflineSongs = new SavedOfflineSongs();
 
-        savedOfflineSongs.setUserName(username);
+        savedOfflineSongs.setUserName(userID);
         savedOfflineSongs.setSongId(songs_ids[counter]);
         savedOfflineSongs.setArtistName(songs_artists[counter]);
         savedOfflineSongs.setSongTitle(songs_titles[counter]);
@@ -355,11 +346,24 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
         request.setTitle(fileName);
         request.allowScanningByMediaScanner();
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
+        File cacheDir = getCacheDir();
+        request.setDestinationInExternalPublicDir(cacheDir.getAbsolutePath(), userID + "-" + fileName);
         DownloadManager downloadManager = (DownloadManager) PlayerActivity.this.getSystemService(Context.DOWNLOAD_SERVICE);
         downloadManager.enqueue(request);
+
+
+        BroadcastReceiver onComplete = new BroadcastReceiver() {
+            public void onReceive(Context ctxt, Intent intent) {
+                Log.d("COMPLETE", "DOWNLOAD IS DONE");
+                Toast.makeText(PlayerActivity.this, "DONE", Toast.LENGTH_LONG).show();
+
+            }
+        };
+        registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+
+
     }
+
 
     public boolean isSongSaved(String song_id, String username) {
 
@@ -379,38 +383,192 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
         return isSaved;
     }
 
-    public void playOffline(String[] songs_url) throws IOException {
+    public void previousOffline(final int size, final String[] songs_ids, final String[] songs_urls, final String[] songs_titles, final String[] songs_artists, final String userID) throws IOException {
+        if (counter > 0) {
+            counter = counter - 1;
 
-        File downloadDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DOWNLOADS).getAbsolutePath());
+            if (counter == 0) {
 
-        String fileName = URLUtil.guessFileName(songs_url[counter], null, MimeTypeMap.getFileExtensionFromUrl(songs_url[counter]));
-        File listAllFiles[] = downloadDir.listFiles();
+                counter = 0;
+            }
 
-        if (listAllFiles != null && listAllFiles.length > 0) {
-            for (File currentFile : listAllFiles) {
-                if (currentFile.isDirectory()) {
-                    if (currentFile.getName().equals(fileName)) {
-                        Log.d("FILE", currentFile.toString());
-                        mediaPlayer.setDataSource(currentFile.toString());
-                        mediaPlayer.prepare();
-                        mediaPlayer.start();
-                    }
+            File cacheDir = getCacheDir();
+            String fileName = URLUtil.guessFileName(songs_urls[counter], null, MimeTypeMap.getFileExtensionFromUrl(songs_urls[counter]));
+            File downloadDir = new File(cacheDir,  userID + "-" + fileName);
+            Log.d("FILE", downloadDir.getName());
+            Log.d("NAME", fileName);
 
-                } else {
-                    if (currentFile.getName().endsWith("")) {
-  
-                        if (currentFile.getName().equals(fileName)) {
-                            Log.d("FILE", currentFile.toString());
-                            mediaPlayer.setDataSource(currentFile.getAbsolutePath());
-                            mediaPlayer.prepare();
-                            mediaPlayer.start();
-                        }
+            if (downloadDir.getName().equals(userID+"-"+fileName)) {
+                Log.d("FILE", downloadDir.toString());
 
+                mediaPlayer.reset();
+                mediaPlayer.setDataSource("/storage/sdcard/" + downloadDir.toString());
+                mediaPlayer.prepare();
+                mediaPlayer.start();
+            }
+
+            mediaPlayer.reset();
+
+            SongTitleTv.setText(songs_titles[counter]);
+            PlayBtn.setEnabled(true);
+            PauseBtn.setEnabled(false);
+
+
+            endTime = mediaPlayer.getDuration();
+            startTime = mediaPlayer.getCurrentPosition();
+            SongBarSb.setMax(endTime);
+
+            SongEndTv.setText(String.format("%d:%d",
+                    TimeUnit.MILLISECONDS.toMinutes((long) endTime),
+                    TimeUnit.MILLISECONDS.toSeconds((long) endTime) -
+                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) endTime)))
+            );
+
+            SongStartTv.setText(String.format("%d:%d",
+                    TimeUnit.MILLISECONDS.toMinutes((long) startTime),
+                    TimeUnit.MILLISECONDS.toSeconds((long) startTime) -
+                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) startTime)))
+            );
+
+            SongBarSb.setProgress(startTime);
+            myHandler.postDelayed(UpdateSongTime, 100);
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    try {
+                        nextOffline(size, songs_ids, songs_urls, songs_titles, songs_artists, userID);
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
+            });
+            SongTitleTv.setText(songs_titles[counter]);
+            ArtistNameTv.setText(songs_artists[counter]);
+            PauseBtn.setEnabled(true);
+            PlayBtn.setEnabled(false);
+        }
+    }
+
+    public void playOffline(final int size, final String[] songs_ids, final String[] songs_urls, final String[] songs_titles, final String[] songs_artists, final String userID) throws IOException {
+
+        SharedPreferences sharedControllerPref = getSharedPreferences("playerControls", Context.MODE_PRIVATE);
+        String isPaused = sharedControllerPref.getString("isPaused", "");
+
+        Log.d("IS PLAYING", String.valueOf(mediaPlayer.isPlaying()));
+        if (mediaPlayer.isPlaying()) {
+            myHandler.removeCallbacks(UpdateSongTime);
+            mediaPlayer.stop();
+            mediaPlayer.release();
+        }
+        Log.d("PAUSED STATE:", isPaused);
+
+        if (isPaused.equals("paused")) {
+            mediaPlayer.seekTo(mediaPlayer.getCurrentPosition());
+            mediaPlayer.start();
+        } else {
+            File cacheDir = getCacheDir();
+            String fileName = URLUtil.guessFileName(songs_urls[counter], null, MimeTypeMap.getFileExtensionFromUrl(songs_urls[counter]));
+            File downloadDir = new File(cacheDir, userID + "-" + fileName);
+            Log.d("FILE", downloadDir.getName());
+            Log.d("NAME", fileName);
+            if (downloadDir.getName().equals(userID + "-" + fileName)) {
+                Log.d("FILE", downloadDir.toString());
+                mediaPlayer.setDataSource("/storage/sdcard/" + downloadDir.toString());
+                mediaPlayer.prepare();
+                mediaPlayer.start();
             }
         }
+        endTime = mediaPlayer.getDuration();
+        startTime = mediaPlayer.getCurrentPosition();
+        SongBarSb.setMax(endTime);
+
+        SongStartTv.setText(String.format("%d:%d",
+                TimeUnit.MILLISECONDS.toMinutes((long) startTime),
+                TimeUnit.MILLISECONDS.toSeconds((long) startTime) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) startTime)))
+        );
+
+        SongBarSb.setProgress(startTime);
+        myHandler.postDelayed(UpdateSongTime, 100);
+
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                try {
+                    nextOffline(size, songs_ids, songs_urls, songs_titles, songs_artists, username);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        SongTitleTv.setText(songs_titles[counter]);
+        ArtistNameTv.setText(songs_artists[counter]);
+
+
+    }
+
+    public void nextOffline(final int size, final String[] songs_ids, final String[] songs_urls, final String[] songs_titles, final String[] songs_artists, final String userID) throws IOException {
+
+        if (counter < size) {
+
+            counter = counter + 1;
+
+            if (counter == size) {
+
+                counter = 0;
+            }
+
+
+            File cacheDir = getCacheDir();
+            String fileName = URLUtil.guessFileName(songs_urls[counter], null, MimeTypeMap.getFileExtensionFromUrl(songs_urls[counter]));
+            File downloadDir = new File(cacheDir, userID + "-" + fileName);
+            Log.d("FILE", downloadDir.getName());
+            Log.d("NAME", fileName);
+            if (downloadDir.getName().equals(userID+"-"+fileName)) {
+                Log.d("FILE", downloadDir.toString());
+                mediaPlayer.reset();
+                mediaPlayer.setDataSource("/storage/sdcard/" + downloadDir.toString());
+                mediaPlayer.prepare();
+                mediaPlayer.start();
+                endTime = mediaPlayer.getDuration();
+                startTime = mediaPlayer.getCurrentPosition();
+                SongBarSb.setMax(endTime);
+            }
+
+        }
+
+        SongEndTv.setText(String.format("%d:%d",
+                TimeUnit.MILLISECONDS.toMinutes((long) endTime),
+                TimeUnit.MILLISECONDS.toSeconds((long) endTime) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) endTime)))
+        );
+
+        SongStartTv.setText(String.format("%d:%d",
+                TimeUnit.MILLISECONDS.toMinutes((long) startTime),
+                TimeUnit.MILLISECONDS.toSeconds((long) startTime) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) startTime)))
+        );
+
+        SongBarSb.setProgress(startTime);
+        myHandler.postDelayed(UpdateSongTime, 100);
+
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                try {
+                    nextOffline(size, songs_ids, songs_urls, songs_titles, songs_artists, username);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        SongTitleTv.setText(songs_titles[counter]);
+        ArtistNameTv.setText(songs_artists[counter]);
+
+        PlayBtn.setEnabled(false);
+        PauseBtn.setEnabled(true);
+
+
     }
 
 

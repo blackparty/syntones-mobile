@@ -42,7 +42,7 @@ public class ViewPlayListActivity extends AppCompatActivity {
 
     private TextView PlaylistNameTv;
     private ListView ViewPlaylistLv;
-    private Button EditSongBtn, RemoveSongBtn;
+    private Button EditSongBtn, RemoveSongBtn, AddSongBtn;
     private ViewPlayListActivity sContext;
     private ArrayAdapter<String> arrayAdapter;
     private ArrayList<String> songs = new ArrayList<>();
@@ -52,10 +52,21 @@ public class ViewPlayListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_play_list);
 
+
         PlaylistNameTv = (TextView) findViewById(R.id.tvPlaylistName);
         ViewPlaylistLv = (ListView) findViewById(R.id.lvViewPlaylist);
         EditSongBtn = (Button) findViewById(R.id.btnEditSong);
+        AddSongBtn = (Button) findViewById(R.id.btnAddSong);
         RemoveSongBtn = (Button) findViewById(R.id.btnRemoveSong);
+
+
+        SharedPreferences sharedPrefEditSong = getSharedPreferences("editInfo", Context.MODE_PRIVATE);
+        boolean editStatus = sharedPrefEditSong.getBoolean("editStatus", false);
+
+        if(editStatus==true){
+            EditSongBtn.setText("Edit");
+            editSong();
+        }
 
         SharedPreferences sharedPrefPlaylistInfo = getSharedPreferences("playlistInfo", Context.MODE_PRIVATE);
         String playlist_name = sharedPrefPlaylistInfo.getString("playlistName", "");
@@ -75,10 +86,16 @@ public class ViewPlayListActivity extends AppCompatActivity {
         EditSongBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                editSong(v);
+                editSong();
             }
         });
 
+        AddSongBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addSong();
+            }
+        });
         RemoveSongBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -89,16 +106,22 @@ public class ViewPlayListActivity extends AppCompatActivity {
     }
 
 
-    public void editSong(View view) {
+    public void editSong() {
 
         if (EditSongBtn.getText().equals("Edit")) {
             displaySongList();
             EditSongBtn.setText("Done");
-            RemoveSongBtn.setVisibility(view.VISIBLE);
+            RemoveSongBtn.setVisibility(View.VISIBLE);
+            AddSongBtn.setVisibility(View.VISIBLE);
         } else if (EditSongBtn.getText().equals("Done")) {
             displayViewSongList();
             EditSongBtn.setText("Edit");
-            RemoveSongBtn.setVisibility(view.INVISIBLE);
+            RemoveSongBtn.setVisibility(View.INVISIBLE);
+            AddSongBtn.setVisibility(View.INVISIBLE);
+            SharedPreferences sharedPrefEditSong = getSharedPreferences("editInfo", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editorEditSong = sharedPrefEditSong.edit();
+            editorEditSong.clear();
+            editorEditSong.apply();
         }
 
     }
@@ -138,6 +161,13 @@ public class ViewPlayListActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    public void addSong(){
+
+        Intent intent = new Intent(ViewPlayListActivity.this, AddSongsActivity.class);
+        startActivity(intent);
+
     }
 
     public void removeSong(View view) {

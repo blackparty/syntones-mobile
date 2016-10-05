@@ -24,7 +24,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String SONG_TITLE = "song_title";
     private static final String FILE_PATH = "file_path";
     private static final String LYRICS = "lyrics";
-    private static final String USER_NAME = "user_name";
+    private static final String USER_ID = "user_id";
 
     public DBHelper(Context context) {
         super(context, DATABASE, null, 1);
@@ -33,7 +33,7 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-        db.execSQL("create table if not exists " + TABLE + " (id integer primary key," + USER_NAME + " text," + SONG_ID + " long," + ARTIST_NAME + " text," + SONG_TITLE + " text," + FILE_PATH + " text," + LYRICS + " text)");
+        db.execSQL("create table if not exists " + TABLE + " (id integer primary key," + USER_ID + " text," + SONG_ID + " long," + ARTIST_NAME + " text," + SONG_TITLE + " text," + FILE_PATH + " text," + LYRICS + " text)");
     }
 
     @Override
@@ -45,7 +45,7 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         try {
-            contentValues.put(USER_NAME, savedOfflineSongs.getUserName());
+            contentValues.put(USER_ID, savedOfflineSongs.getUserName());
             contentValues.put(SONG_ID, savedOfflineSongs.getSongId());
             contentValues.put(ARTIST_NAME, savedOfflineSongs.getArtistName());
             contentValues.put(SONG_TITLE, savedOfflineSongs.getSongTitle());
@@ -65,12 +65,12 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         ArrayList<SavedOfflineSongs> savedOfflineSongsArrayList = new ArrayList<>();
         try {
-            Cursor cursor = db.rawQuery("select * from " + TABLE + " where " + USER_NAME + " = '" + username + "'", null);
+            Cursor cursor = db.rawQuery("select * from " + TABLE + " where " + USER_ID + " = '" + username + "'", null);
 
             cursor.moveToFirst();
             while (cursor.isAfterLast() == false) {
                 SavedOfflineSongs savedOfflineSongs = new SavedOfflineSongs();
-                savedOfflineSongs.setUserName(cursor.getString(cursor.getColumnIndex(USER_NAME)));
+                savedOfflineSongs.setUserName(cursor.getString(cursor.getColumnIndex(USER_ID)));
                 savedOfflineSongs.setSongId(cursor.getString(cursor.getColumnIndex(SONG_ID)));
                 savedOfflineSongs.setArtistName(cursor.getString(cursor.getColumnIndex(ARTIST_NAME)));
                 savedOfflineSongs.setSongTitle(cursor.getString(cursor.getColumnIndex(SONG_TITLE)));

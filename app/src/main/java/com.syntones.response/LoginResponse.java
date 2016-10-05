@@ -13,7 +13,7 @@ public class LoginResponse {
 
     private Message message;
     private List<Playlist> recentlyPlayedPlaylists;
-
+    private User user;
     public LoginResponse() {
     }
 
@@ -38,5 +38,13 @@ public class LoginResponse {
 
     public void setRecentlyPlayedPlaylists(List<Playlist> recentPlaylistsPlayed) {
         this.recentlyPlayedPlaylists = recentPlaylistsPlayed;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

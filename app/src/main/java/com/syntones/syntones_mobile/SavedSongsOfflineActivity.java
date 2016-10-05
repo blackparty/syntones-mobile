@@ -23,7 +23,7 @@ public class SavedSongsOfflineActivity extends AppCompatActivity {
     private ListView SavedSongsOfflineLv;
     private ArrayList<String> saved_offline_songs_list = new ArrayList<>();
     private ArrayAdapter<String> arrayAdapter;
-    private String username;
+    private String userID;
     private ImageView BackToLibIv;
 
     @Override
@@ -33,7 +33,7 @@ public class SavedSongsOfflineActivity extends AppCompatActivity {
 
         SharedPreferences sharedPrefUserInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
 
-        username = sharedPrefUserInfo.getString("username", "");
+        userID = String.valueOf(sharedPrefUserInfo.getLong("userID", 0));
 
         SavedSongsOfflineLv = (ListView) findViewById(R.id.lvSavedSongsOffline);
         BackToLibIv = (ImageView) findViewById(R.id.ivBackToLib);
@@ -58,7 +58,7 @@ public class SavedSongsOfflineActivity extends AppCompatActivity {
 
         DBHelper db = new DBHelper(this);
 
-        ArrayList<SavedOfflineSongs> savedOfflineSongsArrayList = db.getAllSavedOfflineSongsFromUser(username);
+        ArrayList<SavedOfflineSongs> savedOfflineSongsArrayList = db.getAllSavedOfflineSongsFromUser(userID);
 
         Log.d("SQL size", String.valueOf(savedOfflineSongsArrayList.size()));
 
