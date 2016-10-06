@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.syntones.model.SavedOfflineSongs;
 
+import java.sql.Date;
 import java.util.ArrayList;
 
 /**
@@ -25,6 +26,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String FILE_PATH = "file_path";
     private static final String LYRICS = "lyrics";
     private static final String USER_ID = "user_id";
+    private static final String START_DATE = "start_date";
 
     public DBHelper(Context context) {
         super(context, DATABASE, null, 1);
@@ -33,7 +35,7 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-        db.execSQL("create table if not exists " + TABLE + " (id integer primary key," + USER_ID + " text," + SONG_ID + " long," + ARTIST_NAME + " text," + SONG_TITLE + " text," + FILE_PATH + " text," + LYRICS + " text)");
+        db.execSQL("create table if not exists " + TABLE + " (id integer primary key," + USER_ID + " text," + SONG_ID + " long," + ARTIST_NAME + " text," + SONG_TITLE + " text," + FILE_PATH + " text," + LYRICS + " text," + START_DATE + " text" + ")");
     }
 
     @Override
@@ -51,6 +53,7 @@ public class DBHelper extends SQLiteOpenHelper {
             contentValues.put(SONG_TITLE, savedOfflineSongs.getSongTitle());
             contentValues.put(FILE_PATH, savedOfflineSongs.getFilePath());
             contentValues.put(LYRICS, savedOfflineSongs.getLyrics());
+            contentValues.put(START_DATE, savedOfflineSongs.getStartDate().toString());
 
             db.insert(TABLE, null, contentValues);
 
@@ -61,11 +64,11 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
-    public ArrayList<SavedOfflineSongs> getAllSavedOfflineSongsFromUser(String username) {
+    public ArrayList<SavedOfflineSongs> getAllSavedOfflineSongsFromUser(String userID) {
         SQLiteDatabase db = this.getReadableDatabase();
         ArrayList<SavedOfflineSongs> savedOfflineSongsArrayList = new ArrayList<>();
         try {
-            Cursor cursor = db.rawQuery("select * from " + TABLE + " where " + USER_ID + " = '" + username + "'", null);
+            Cursor cursor = db.rawQuery("select * from " + TABLE + " where " + USER_ID + " = '" + userID + "'", null);
 
             cursor.moveToFirst();
             while (cursor.isAfterLast() == false) {
@@ -76,6 +79,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 savedOfflineSongs.setSongTitle(cursor.getString(cursor.getColumnIndex(SONG_TITLE)));
                 savedOfflineSongs.setFilePath(cursor.getString(cursor.getColumnIndex(FILE_PATH)));
                 savedOfflineSongs.setLyrics(cursor.getString(cursor.getColumnIndex(LYRICS)));
+                savedOfflineSongs.setStartDate(cursor.getString(cursor.getColumnIndex(START_DATE)));
                 savedOfflineSongsArrayList.add(savedOfflineSongs);
                 cursor.moveToNext();
             }
@@ -85,5 +89,11 @@ public class DBHelper extends SQLiteOpenHelper {
             return null;
         }
 
+    }
+
+    public void deleteSavedSongsFromUser(String userID, String songID) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.delete(TABLE, USER_ID + " = " + userID + " AND " + SONG_ID + " = " + songID, null);
     }
 }

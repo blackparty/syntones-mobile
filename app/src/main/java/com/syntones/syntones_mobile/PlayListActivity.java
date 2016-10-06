@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +45,7 @@ public class PlayListActivity extends AppCompatActivity {
     private ListView PlaylistsLv;
     private Button RemoveBtn, EditBtn;
     private String buttonStatus;
+    private ImageView BackIv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +57,7 @@ public class PlayListActivity extends AppCompatActivity {
         PlaylistsLv.setAdapter(arrayAdapter);
         RemoveBtn = (Button) findViewById(R.id.btnRemove);
         EditBtn = (Button) findViewById(R.id.btnEdit);
+        BackIv = (ImageView) findViewById(R.id.ivBack);
 
         insertPlaylist();
         displayViewPlaylistList();
@@ -80,15 +83,7 @@ public class PlayListActivity extends AppCompatActivity {
                 this.displayAddToPlaylistListView(song_id);
 
             }
-//            else if (!buttonStatus.equals("addToPlaylist") && EditBtn.getText().toString().equals("Edit")) {
-//
-//                Log.d("EDIT BUTTON STATUS", EditBtn.getText().toString());
-//                this.displayViewPlaylistList();
-//
-//
-//            } else if (!buttonStatus.equals("addToPlaylist") && EditBtn.getText().toString().equals("Done")) {
-//                this.displayPlaylist();
-//            }
+
         }
 
 
@@ -99,6 +94,13 @@ public class PlayListActivity extends AppCompatActivity {
             }
         });
 
+        BackIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(PlayListActivity.this, YourLibraryActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     public void displayPlaylist() {

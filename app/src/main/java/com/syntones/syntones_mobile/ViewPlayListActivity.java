@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,6 +47,7 @@ public class ViewPlayListActivity extends AppCompatActivity {
     private ViewPlayListActivity sContext;
     private ArrayAdapter<String> arrayAdapter;
     private ArrayList<String> songs = new ArrayList<>();
+    private ImageView BackIv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +60,7 @@ public class ViewPlayListActivity extends AppCompatActivity {
         EditSongBtn = (Button) findViewById(R.id.btnEditSong);
         AddSongBtn = (Button) findViewById(R.id.btnAddSong);
         RemoveSongBtn = (Button) findViewById(R.id.btnRemoveSong);
+        BackIv = (ImageView) findViewById(R.id.ivBack);
 
 
         SharedPreferences sharedPrefEditSong = getSharedPreferences("editInfo", Context.MODE_PRIVATE);
@@ -100,6 +103,14 @@ public class ViewPlayListActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 removeSong(v);
+            }
+        });
+
+        BackIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ViewPlayListActivity.this, PlayListActivity.class);
+                startActivity(intent);
             }
         });
 

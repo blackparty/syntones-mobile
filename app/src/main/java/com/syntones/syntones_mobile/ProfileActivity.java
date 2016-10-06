@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,6 +34,7 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView ProfUsernameTv;
     private Button MakeMeAPlaylistBtn;
     private ProfileActivity sContext;
+    private ImageView SearchIv, YourLibraryIv;
 
 
     @Override
@@ -42,6 +44,9 @@ public class ProfileActivity extends AppCompatActivity {
 
         ProfUsernameTv = (TextView) findViewById(R.id.tvProfUsername);
         MakeMeAPlaylistBtn = (Button) findViewById(R.id.btnMakeMeAPlaylist);
+        SearchIv = (ImageView) findViewById(R.id.ivSearch);
+        YourLibraryIv = (ImageView) findViewById(R.id.ivYourLibrary);
+
         SharedPreferences sharedPrefUserInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
 
         String username = sharedPrefUserInfo.getString("username", "");
@@ -55,6 +60,22 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
+        SearchIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ProfileActivity.this, SearchActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        YourLibraryIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ProfileActivity.this, YourLibraryActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
     public void makeMeAPlaylistBtn() {
@@ -62,27 +83,6 @@ public class ProfileActivity extends AppCompatActivity {
         Intent intent = new Intent(this, GeneratePlaylistMenuActivity.class);
         startActivity(intent);
 
-    }
-
-    public void bottomBar(View view) {
-        String btnText;
-
-        btnText = ((Button) view).getText().toString();
-
-        if (btnText.equals("Home")) {
-
-            Intent intent = new Intent(this, HomeActivity.class);
-            startActivity(intent);
-
-        } else if (btnText.equals("Search")) {
-
-            Intent intent = new Intent(this, SearchActivity.class);
-            startActivity(intent);
-        } else if (btnText.equals("Your Library")) {
-
-            Intent intent = new Intent(this, YourLibraryActivity.class);
-            startActivity(intent);
-        }
 
     }
 

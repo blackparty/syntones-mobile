@@ -23,14 +23,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.syntones.model.Product;
+import com.syntones.model.User;
 
 import org.w3c.dom.Text;
 
 public class YourLibraryActivity extends AppCompatActivity {
 
-
-    private ListView RecentlyPlayedLv;
-    private ImageView SearchIv, LibraryIv, ViewPlaylistsIv, ViewSavedSongsOfflineIv;
+    private ImageView SearchIv, LibraryIv, ViewPlaylistsIv, ViewSavedSongsOfflineIv, UserIv;
+    private TextView UsernameTv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,10 +41,14 @@ public class YourLibraryActivity extends AppCompatActivity {
 
         ViewPlaylistsIv = (ImageView) findViewById(R.id.ivViewPlaylists);
         ViewSavedSongsOfflineIv = (ImageView) findViewById(R.id.ivViewSavedSongsOffline);
-
+        UserIv = (ImageView) findViewById(R.id.ivUser);
         SearchIv = (ImageView) findViewById(R.id.ivSearch);
         LibraryIv = (ImageView) findViewById(R.id.ivLibrary);
+        UsernameTv = (TextView) findViewById(R.id.tvUsername);
 
+        SharedPreferences sharedPrefUserInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        String username = sharedPrefUserInfo.getString("username", "");
+        UsernameTv.setText(username);
 
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -89,11 +93,22 @@ public class YourLibraryActivity extends AppCompatActivity {
             }
         });
 
-    }
+        UsernameTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.yourlibrary, menu);
-        return super.onCreateOptionsMenu(menu);
+                Intent intent = new Intent(YourLibraryActivity.this, ProfileActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        UserIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(YourLibraryActivity.this, ProfileActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
 

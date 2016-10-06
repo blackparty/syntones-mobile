@@ -50,8 +50,13 @@ import com.syntones.response.TwoItemSetResponse;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
@@ -311,7 +316,7 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-                if (isSongSaved(songs_ids[counter], username) == false) {
+                if (isSongSaved(songs_ids[counter], userID) == false) {
                     if (SaveOfflineSw.isChecked()) {
 
                         saveSongsOffline(userID, songs_ids, songs_urls, songs_titles, songs_artists, songs_lyrics);
@@ -321,23 +326,26 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
             }
         });
 
-        if (isSongSaved(songs_ids[counter], username) == true) {
+        if (isSongSaved(songs_ids[counter], userID) == true) {
             SaveOfflineSw.setChecked(true);
-            SaveOfflineSw.setClickable(false);
+            SaveOfflineSw.setEnabled(false);
         }
 
     }
 
     public void saveSongsOffline(final String userID, final String[] songs_ids, final String[] songs_urls, final String[] songs_titles, final String[] songs_artists, final String[] songs_lyrics) {
+        SaveOfflineSw.setEnabled(false);
         DBHelper db = new DBHelper(PlayerActivity.this);
         SavedOfflineSongs savedOfflineSongs = new SavedOfflineSongs();
-
+        Calendar calendar = Calendar.getInstance();
+        DateFormat startDateFormat = new SimpleDateFormat("MM/dd/yyyy");
         savedOfflineSongs.setUserName(userID);
         savedOfflineSongs.setSongId(songs_ids[counter]);
         savedOfflineSongs.setArtistName(songs_artists[counter]);
         savedOfflineSongs.setSongTitle(songs_titles[counter]);
         savedOfflineSongs.setLyrics(songs_lyrics[counter]);
         savedOfflineSongs.setFilePath(songs_urls[counter]);
+        savedOfflineSongs.setStartDate(startDateFormat.format(calendar.getTime()));
 
         db.insertSavedSong(savedOfflineSongs);
 
@@ -365,18 +373,19 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
     }
 
 
-    public boolean isSongSaved(String song_id, String username) {
+    public boolean isSongSaved(String song_id, String userID) {
 
         boolean isSaved = false;
 
         DBHelper db = new DBHelper(this);
 
-        ArrayList<SavedOfflineSongs> savedOfflineSongsArrayList = db.getAllSavedOfflineSongsFromUser(username);
+        ArrayList<SavedOfflineSongs> savedOfflineSongsArrayList = db.getAllSavedOfflineSongsFromUser(userID);
 
         for (SavedOfflineSongs a : savedOfflineSongsArrayList) {
 
             if (song_id.equals(a.getSongId())) {
                 isSaved = true;
+                Log.d("IS SAVED", userID + a.getSongId());
             }
 
         }
@@ -394,11 +403,11 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
 
             File cacheDir = getCacheDir();
             String fileName = URLUtil.guessFileName(songs_urls[counter], null, MimeTypeMap.getFileExtensionFromUrl(songs_urls[counter]));
-            File downloadDir = new File(cacheDir,  userID + "-" + fileName);
+            File downloadDir = new File(cacheDir, userID + "-" + fileName);
             Log.d("FILE", downloadDir.getName());
             Log.d("NAME", fileName);
 
-            if (downloadDir.getName().equals(userID+"-"+fileName)) {
+            if (downloadDir.getName().equals(userID + "-" + fileName)) {
                 Log.d("FILE", downloadDir.toString());
 
                 mediaPlayer.reset();
@@ -406,8 +415,6 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
                 mediaPlayer.prepare();
                 mediaPlayer.start();
             }
-
-            mediaPlayer.reset();
 
             SongTitleTv.setText(songs_titles[counter]);
             PlayBtn.setEnabled(true);
@@ -482,6 +489,12 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
         startTime = mediaPlayer.getCurrentPosition();
         SongBarSb.setMax(endTime);
 
+        SongEndTv.setText(String.format("%d:%d",
+                TimeUnit.MILLISECONDS.toMinutes((long) endTime),
+                TimeUnit.MILLISECONDS.toSeconds((long) endTime) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) endTime)))
+        );
+
         SongStartTv.setText(String.format("%d:%d",
                 TimeUnit.MILLISECONDS.toMinutes((long) startTime),
                 TimeUnit.MILLISECONDS.toSeconds((long) startTime) -
@@ -490,19 +503,20 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
 
         SongBarSb.setProgress(startTime);
         myHandler.postDelayed(UpdateSongTime, 100);
+        SongTitleTv.setText(songs_titles[counter]);
+        ArtistNameTv.setText(songs_artists[counter]);
+
 
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 try {
-                    nextOffline(size, songs_ids, songs_urls, songs_titles, songs_artists, username);
+                    nextOffline(size, songs_ids, songs_urls, songs_titles, songs_artists, userID);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         });
-        SongTitleTv.setText(songs_titles[counter]);
-        ArtistNameTv.setText(songs_artists[counter]);
 
 
     }
@@ -524,7 +538,7 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
             File downloadDir = new File(cacheDir, userID + "-" + fileName);
             Log.d("FILE", downloadDir.getName());
             Log.d("NAME", fileName);
-            if (downloadDir.getName().equals(userID+"-"+fileName)) {
+            if (downloadDir.getName().equals(userID + "-" + fileName)) {
                 Log.d("FILE", downloadDir.toString());
                 mediaPlayer.reset();
                 mediaPlayer.setDataSource("/storage/sdcard/" + downloadDir.toString());
@@ -556,7 +570,7 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
             @Override
             public void onCompletion(MediaPlayer mp) {
                 try {
-                    nextOffline(size, songs_ids, songs_urls, songs_titles, songs_artists, username);
+                    nextOffline(size, songs_ids, songs_urls, songs_titles, songs_artists, userID);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

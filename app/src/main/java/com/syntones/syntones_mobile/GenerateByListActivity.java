@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -30,6 +31,7 @@ public class GenerateByListActivity extends AppCompatActivity {
     private ArrayList<String> artist_list = new ArrayList<>();
     private ArrayList<String> tag_list = new ArrayList<>();
     private ArrayAdapter<String> arrayAdapter;
+    private ImageView BackIv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +40,7 @@ public class GenerateByListActivity extends AppCompatActivity {
 
         GenerateByLv = (ListView) findViewById(R.id.lvGenerateBy);
         tvGenerateBy = (TextView) findViewById(R.id.tvGenerateBy);
+        BackIv = (ImageView) findViewById(R.id.ivBack);
 
         Bundle extras = getIntent().getExtras();
         String generateBy = extras.get("GenerateBy").toString();
@@ -62,6 +65,14 @@ public class GenerateByListActivity extends AppCompatActivity {
 
             this.displayAllTags();
         }
+
+        BackIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(GenerateByListActivity.this, GeneratePlaylistMenuActivity.class);
+                startActivity(intent);
+            }
+        });
 
 
     }

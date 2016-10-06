@@ -3,10 +3,14 @@ package com.syntones.syntones_mobile;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Environment;
+import android.provider.CalendarContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.webkit.MimeTypeMap;
+import android.webkit.URLUtil;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -16,7 +20,18 @@ import android.widget.ListView;
 import com.syntones.model.SavedOfflineSongs;
 import com.syntones.remote.DBHelper;
 
+import org.joda.time.DateTime;
+import org.joda.time.Days;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
+import java.io.File;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class SavedSongsOfflineActivity extends AppCompatActivity {
 
@@ -40,7 +55,11 @@ public class SavedSongsOfflineActivity extends AppCompatActivity {
 
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_single_choice, saved_offline_songs_list);
         SavedSongsOfflineLv.setAdapter(arrayAdapter);
-
+        try {
+            deleteFiles();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         insertSavedSongsOffline();
         displaySavedSongsOffline();
 
@@ -126,5 +145,40 @@ public class SavedSongsOfflineActivity extends AppCompatActivity {
         });
     }
 
+
+
+
+    public void deleteFiles() throws ParseException {
+        Calendar calendar = Calendar.getInstance();
+        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        String currentDate = dateFormat.format(calendar.getTime()), startDate;
+        DBHelper db = new DBHelper(this);
+
+        ArrayList<SavedOfflineSongs> savedOfflineSongsArrayList = db.getAllSavedOfflineSongsFromUser(userID);
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("MM/dd/yyyy");
+        File cacheDir = getCacheDir();
+        for (SavedOfflineSongs a : savedOfflineSongsArrayList) {
+
+            startDate = a.getStartDate();
+            DateTime dtStart = formatter.parseDateTime(startDate);
+            DateTime dtOrgStart = new DateTime(dtStart);
+            DateTime dtExpired = dtOrgStart.plusDays(2);
+            DateTime dtCurrent = formatter.parseDateTime(currentDate);
+
+            int days = Days.daysBetween(dtStart, dtCurrent).getDays();
+            if (days>=2) {
+
+                String fileName = URLUtil.guessFileName(a.getFilePath(), null, MimeTypeMap.getFileExtensionFromUrl(a.getFilePath()));
+                File file = new File("/storage/sdcard" + cacheDir, userID + "-" + fileName);
+                file.delete();
+                db.deleteSavedSongsFromUser(userID, a.getSongId());
+                Log.d("EXPIRED", startDate + " - " + dtExpired.toString(formatter));
+            }
+
+
+            Log.d("DATE EXPIRATION", startDate + " - " + dtExpired.toString(formatter));
+        }
+
+    }
 
 }

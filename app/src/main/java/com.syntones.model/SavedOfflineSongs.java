@@ -1,22 +1,25 @@
 package com.syntones.model;
 
+import java.util.Date;
+
 /**
  * Created by Courtney Love on 10/2/2016.
  */
 
 public class SavedOfflineSongs {
-    private String artistName, songTitle, filePath, lyrics, songId, userName;
+    private String artistName, songTitle, filePath, lyrics, songId, userName, startDate;
 
     public SavedOfflineSongs() {
     }
 
-    public SavedOfflineSongs(String artistName, String songTitle, String filePath, String lyrics, String songId, String userName) {
+    public SavedOfflineSongs(String artistName, String songTitle, String filePath, String lyrics, String songId, String userName, String startDate) {
         this.artistName = artistName;
         this.songTitle = songTitle;
         this.filePath = filePath;
         this.lyrics = lyrics;
         this.songId = songId;
         this.userName = userName;
+        this.startDate = startDate;
     }
 
     public String getArtistName() {
@@ -65,5 +68,13 @@ public class SavedOfflineSongs {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
     }
 }

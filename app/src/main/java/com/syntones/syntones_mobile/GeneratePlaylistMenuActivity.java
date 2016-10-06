@@ -9,7 +9,7 @@ import android.widget.ImageView;
 
 public class GeneratePlaylistMenuActivity extends AppCompatActivity {
 
-    private ImageView ByArtistIv, ByTagsIv;
+    private ImageView ByArtistIv, ByTagsIv, BackIv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,7 +18,7 @@ public class GeneratePlaylistMenuActivity extends AppCompatActivity {
 
         ByArtistIv = (ImageView) findViewById(R.id.ivArtist);
         ByTagsIv = (ImageView) findViewById(R.id.ivTags);
-
+        BackIv = (ImageView) findViewById(R.id.ivBack);
 
         final Intent intent = new Intent(this, GenerateByListActivity.class);
 
@@ -34,6 +34,14 @@ public class GeneratePlaylistMenuActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 intent.putExtra("GenerateBy", "Tags");
+                startActivity(intent);
+            }
+        });
+
+        BackIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(GeneratePlaylistMenuActivity.this, ProfileActivity.class);
                 startActivity(intent);
             }
         });

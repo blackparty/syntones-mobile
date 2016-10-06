@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_generate_by_list"
     android:layout_width="match_parent"
@@ -11,17 +12,6 @@
     tools:context="com.syntones.syntones_mobile.GenerateByListActivity"
     android:background="#ecf0f1">
 
-    <TextView
-        android:text="Generate By"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/tvGenerateBy"
-        android:textSize="24sp"
-        android:textColor="#34495e" />
-
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -30,4 +20,26 @@
         android:layout_marginTop="10dp"
         android:id="@+id/lvGenerateBy"
         android:backgroundTint="#ecf0f1" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/left_arrow"
+        android:id="@+id/ivBack"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="Generate By"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvGenerateBy"
+        android:textSize="24sp"
+        android:textColor="#34495e"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/ivBack"
+        android:layout_toEndOf="@+id/ivBack"
+        android:layout_marginLeft="25dp"
+        android:layout_marginStart="25dp" />
 </RelativeLayout>
