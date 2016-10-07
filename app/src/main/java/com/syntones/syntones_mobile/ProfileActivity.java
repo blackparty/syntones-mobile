@@ -3,6 +3,7 @@ package com.syntones.syntones_mobile;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -35,7 +36,7 @@ public class ProfileActivity extends AppCompatActivity {
     private Button MakeMeAPlaylistBtn;
     private ProfileActivity sContext;
     private ImageView SearchIv, YourLibraryIv;
-
+    private static MediaPlayer mediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +53,9 @@ public class ProfileActivity extends AppCompatActivity {
         String username = sharedPrefUserInfo.getString("username", "");
 
         ProfUsernameTv.setText(username);
+
+
+
 
         MakeMeAPlaylistBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,6 +92,10 @@ public class ProfileActivity extends AppCompatActivity {
 
 
     public void logOut(View view) {
+
+        PlayerActivity playerActivity = new PlayerActivity();
+        playerActivity.stopPlaying();
+
         SharedPreferences sharedPrefUserInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         SharedPreferences.Editor editorUserInfo = sharedPrefUserInfo.edit();
 

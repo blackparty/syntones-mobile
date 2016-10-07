@@ -262,7 +262,7 @@ public class PlayListActivity extends AppCompatActivity {
                 editorPlaylistInfo.apply();
                 editorPlaylistInfoOffline.apply();
 
-                Log.e("Playlist Response: ", playlistResponse.getMessage().getMessage());
+             /*   Log.e("Playlist Response: ", playlistResponse.getMessage().getMessage());*/
             }
 
             @Override

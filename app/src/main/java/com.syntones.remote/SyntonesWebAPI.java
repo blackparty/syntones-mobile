@@ -72,7 +72,7 @@ public interface SyntonesWebAPI {
     Call<RemovePlaylistResponse> removeSongFromPlaylist(@Body PlaylistSong playlistSong);
 
     @POST("listen")
-    Call<ListenResponse> listen(@Body List<TemporaryDB> temporaryDB);
+    Call<ListenResponse> listen(@Body TemporaryDB temporaryDB);
 
     @POST("listenPlaylist")
     Call<ListenResponse> listenPlaylist(@Body Playlist playlist);

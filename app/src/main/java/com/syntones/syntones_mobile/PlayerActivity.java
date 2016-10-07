@@ -48,13 +48,20 @@ import com.syntones.response.SongListResponse;
 import com.syntones.response.ThreeItemSetResponse;
 import com.syntones.response.TwoItemSetResponse;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.io.File;
 import java.io.IOException;
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -82,10 +89,10 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
     private ArrayAdapter<String> arrayAdapter;
     private ArrayList<String> songs = new ArrayList<>();
     private String[] nextId, nextUrl, nextSongTitle, nextArtistName;
-    private int counter = 0, nextSize;
-    private int position, startTime, endTime, count = 0;
+    private int counter = 0, nextSize, position, startTime, endTime, count = 0;
     private long playlist_id;
     private static int THRESHOLD = 50;
+    public boolean isPlaying, twoItemIsNull, threeItemIsNull;
     private static IpAddressSetting iPAddressSetting = new IpAddressSetting();
     private static String IPADDRESS = "http://" + iPAddressSetting.getiPAddress();
 
@@ -186,8 +193,28 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
 
         }
 
+        if (mediaPlayer != null) {
+            Log.d("PLAYING", "TRUE");
+            isPlaying = true;
 
-        mediaPlayer = new MediaPlayer();
+            myHandler.removeCallbacks(UpdateSongTime);
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            mediaPlayer = new MediaPlayer();
+            try {
+                play(size, songs_ids, songs_urls, songs_titles, songs_artists, playlist_id);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+        } else {
+            isPlaying = false;
+            mediaPlayer = new MediaPlayer();
+        }
+
+
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         SongTitleTv.setText(songs_titles[counter]);
         ArtistNameTv.setText(songs_artists[counter]);
@@ -257,6 +284,8 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
 
                 } catch (IOException e) {
                     e.printStackTrace();
+                } catch (ParseException e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -285,6 +314,8 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
                         nextOffline(size, songs_ids, songs_urls, songs_titles, songs_artists, userID);
                     }
                 } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ParseException e) {
                     e.printStackTrace();
                 }
             }
@@ -662,6 +693,8 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
                         next(size, songs_ids, songs_urls, songs_titles, songs_artists, playlist_id);
                     } catch (IOException e) {
                         e.printStackTrace();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
                     }
                 }
             });
@@ -672,16 +705,11 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
         }
     }
 
-    public void play(final int size, final String[] songs_ids, final String[] songs_urls, final String[] songs_titles, final String[] songs_artists, final long playlist_id) throws IOException {
+    public void play(final int size, final String[] songs_ids, final String[] songs_urls, final String[] songs_titles, final String[] songs_artists, final long playlist_id) throws IOException, ParseException {
         SharedPreferences sharedControllerPref = getSharedPreferences("playerControls", Context.MODE_PRIVATE);
         String isPaused = sharedControllerPref.getString("isPaused", "");
 
-        Log.d("IS PLAYING", String.valueOf(mediaPlayer.isPlaying()));
-        if (mediaPlayer.isPlaying()) {
-            myHandler.removeCallbacks(UpdateSongTime);
-            mediaPlayer.stop();
-            mediaPlayer.release();
-        }
+   /*     Log.d("IS PLAYING", String.valueOf(mediaPlayer.isPlaying()));*/
         Log.d("PAUSED STATE:", isPaused);
 
         if (isPaused.equals("paused")) {
@@ -727,8 +755,12 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
             getTwoItemSet();
             getThreeItemSet();
             displayRecommendation();
-            arrayAdapter.notifyDataSetChanged();
-            BasketRecomLv.setAdapter(arrayAdapter);
+            if (arrayAdapter != null) {
+                arrayAdapter.notifyDataSetChanged();
+                BasketRecomLv.setAdapter(arrayAdapter);
+            }
+/*            arrayAdapter.notifyDataSetChanged();
+            BasketRecomLv.setAdapter(arrayAdapter);*/
             saveToTemporaryDB(songs_ids[counter], username);
 
             String activityState = sharedPrefActivityInfo.getString("activityState", "");
@@ -767,12 +799,14 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
                         next(size, songs_ids, songs_urls, songs_titles, songs_artists, playlist_id);
                     } catch (IOException e) {
                         e.printStackTrace();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
                     }
                 }
             });
         }
         PlayBtn.setEnabled(false);
-
+        PauseBtn.setEnabled(true);
 
     }
 
@@ -798,7 +832,7 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
     }
 
 
-    public void next(final int size, final String[] songs_ids, final String[] songs_urls, final String[] songs_titles, final String[] songs_artists, final long playlist_id) throws IOException {
+    public void next(final int size, final String[] songs_ids, final String[] songs_urls, final String[] songs_titles, final String[] songs_artists, final long playlist_id) throws IOException, ParseException {
 
         SharedPreferences sharedControllerPref = getSharedPreferences("playerControls", Context.MODE_PRIVATE);
         String isPaused = sharedControllerPref.getString("isPaused", "");
@@ -886,6 +920,8 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
                     next(size, songs_ids, songs_urls, songs_titles, songs_artists, playlist_id);
                 } catch (IOException e) {
                     e.printStackTrace();
+                } catch (ParseException e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -958,19 +994,25 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
 
     }
 
-    public void saveToTemporaryDB(String songs_urls, String username) {
+    public void saveToTemporaryDB(String songs_urls, String username) throws ParseException {
 
-        List<TemporaryDB> temporaryDB_list = new ArrayList<>();
 
         TemporaryDB temporaryDB = new TemporaryDB();
 
+
+        Date currdate = new Date();
+        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss a");
+        Timestamp timeStamp = new Timestamp(currdate.getTime());
+        String currentDateTimeString = dateFormat.format(timeStamp);
+        Log.d("DATE", String.valueOf(timeStamp));
+
+
         temporaryDB.setSong_id(Long.parseLong(songs_urls));
         temporaryDB.setUser_id(username);
+        temporaryDB.setDate(timeStamp);
 
-        temporaryDB_list.add(temporaryDB);
 
-
-        SyntonesWebAPI.Factory.getInstance(sContext).listen(temporaryDB_list).enqueue(new Callback<ListenResponse>() {
+        SyntonesWebAPI.Factory.getInstance(sContext).listen(temporaryDB).enqueue(new Callback<ListenResponse>() {
             @Override
             public void onResponse(Call<ListenResponse> call, Response<ListenResponse> response) {
 
@@ -1017,7 +1059,7 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
                 List<TwoItemSet> twoItemSetList = twoItemSetResponse.getTwo_item_set_list();
 
                 if (twoItemSetList != null) {
-
+                    twoItemIsNull = false;
                     String[] track_id;
                     for (final TwoItemSet a : twoItemSetList) {
                         track_id = a.getTrack_id().split(",");
@@ -1063,6 +1105,7 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
 
             }
         });
+
     }
 
     public void getThreeItemSet() {
@@ -1074,7 +1117,7 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
                 List<ThreeItemSet> threeItemSetList = threeItemSetResponse.getThree_item_set_list();
 
                 if (threeItemSetList != null) {
-
+                    threeItemIsNull = false;
                     String[] track_id;
                     for (final ThreeItemSet b : threeItemSetList) {
 
@@ -1119,6 +1162,7 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
 
             }
         });
+
     }
 
     public void showLyrics(String activityState, String[] song_lyrics) {
@@ -1169,6 +1213,11 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
             });
         }
 
+    }
+
+    public void stopPlaying() {
+        myHandler.removeCallbacks(UpdateSongTime);
+        mediaPlayer.stop();
     }
 
     public void backToPlaylist() {
@@ -1258,8 +1307,7 @@ public class PlayerActivity extends AppCompatActivity implements MediaPlayer.OnC
                             }
                         }
                         editorPlayedSongInfo.apply();
-                        myHandler.removeCallbacks(UpdateSongTime);
-                        mediaPlayer.stop();
+
                         SharedPreferences sharedPrefActivityInfo = getSharedPreferences("activityInfo", Context.MODE_PRIVATE);
                         SharedPreferences.Editor editorActivityInfo = sharedPrefActivityInfo.edit();
                         editorActivityInfo.putString("activityState", "SearchActivity");
